@@ -5,3 +5,8 @@ _*
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+*.o
+*.h5
+*.gsd
+/src/simulation/main
