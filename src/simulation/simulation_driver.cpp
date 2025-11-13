@@ -1,0 +1,371 @@
+#include <print>
+#include <random>
+
+#include "simulation_driver.hpp"
+
+#include "common_types.hpp"
+#include "structure_data.hpp"
+#include "forcefields/activated_interaction_forcefield.hpp"
+#include "potentials/cosine_angle_potential.hpp"
+#include "reactions/association_simulator.hpp"
+#include "misc/point_manipulations.hpp"
+
+
+simulation_driver::simulation_driver(simulation_config const& config)
+: _config(config)
+, _structure({})
+{
+    setup();
+}
+
+
+void
+simulation_driver::setup()
+{
+    _setup = {};
+
+    for (auto const& chain_config : _config.chains) {
+        _setup.chains.push_back({
+            .start  = _setup.particle_count,
+            .end    = _setup.particle_count + chain_config.length,
+            .config = chain_config
+        });
+        _setup.particle_count += chain_config.length;
+    }
+    _setup.box = md::open_box { .particle_count = _setup.particle_count };
+    _setup.container_sphere = { .center = {}, .radius = _config.environment.container_radius };
+
+    _structure = structure_data(_setup.box);
+
+    setup_particles();
+    setup_association_simulator();
+    setup_loop_extrusion_simulator();
+    setup_forcefield_pairwise();
+    setup_forcefield_connectivity();
+    setup_forcefield_associations();
+    setup_forcefield_loops();
+}
+
+
+void
+simulation_driver::setup_particles()
+{
+    for (std::size_t i = 0; i < _setup.particle_count; i++) {
+        _system.add_particle({
+            .mobility = _config.chain.monomer_mobility,
+        });
+    }
+}
+
+
+void
+simulation_driver::setup_association_simulator()
+{
+    association_simulator associations({
+        .site_count           = _system.particle_count(),
+        .valency              = _config.association.valency,
+        .association_distance = _config.association.association_distance,
+        .association_rate     = _config.association.association_rate,
+        .dissociation_rate    = _config.association.dissociation_rate,
+    });
+
+    for (auto const& chain : _setup.chains) {
+        for (auto const& feature : chain.config.association_features) {
+            for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
+                std::size_t const site = chain.start + i;
+
+                if (auto val = feature.association) { associations.set_association_factor(site, *val); }
+                if (auto val = feature.dissociation) { associations.set_dissociation_factor(site, *val); }
+            }
+        }
+    }
+
+    _associations = std::make_shared<association_simulator>(associations);
+    _structure.request_neighbor_list(_config.association.association_distance);
+}
+
+
+void
+simulation_driver::setup_loop_extrusion_simulator()
+{
+    loop_extrusion_simulator loops({
+        .site_count       = _system.particle_count(),
+        .loading_rate     = _config.extruder.loading_rate,
+        .unloading_rate   = _config.extruder.unloading_rate,
+        .extrusion_rate   = _config.extruder.extrusion_rate,
+        .contraction_rate = _config.extruder.contraction_rate,
+        .crossing_factor  = _config.extruder.crossing_factor,
+    });
+
+    auto const foreach_site = [](auto const& feature, auto callback) {
+        for (std::size_t const i : feature.site) {
+            if (feature.direction & site_directions::left) {
+                callback(i, loop_extrusion_simulator::directions::leftward);
+            }
+            if (feature.direction & site_directions::right) {
+                callback(i, loop_extrusion_simulator::directions::rightward);
+            }
+        }
+    };
+
+    for (auto const& chain : _setup.chains) {
+        for (auto const& feature : chain.config.extruder_features) {
+            for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
+                foreach_site(feature, [&](auto index, auto dir) {
+                    std::size_t const site = chain.start + index;
+                    if (auto val = feature.loading) { loops.set_loading_factor(site, dir, *val); }
+                    if (auto val = feature.unloading) { loops.set_unloading_factor(site, dir, *val); }
+                    if (auto val = feature.arrival) { loops.set_arrival_factor(site, dir, *val); }
+                    if (auto val = feature.departure) { loops.set_departure_factor(site, dir, *val); }
+                });
+            }
+        }
+
+        // Prevent extruders from fall out of the chain.
+        if (chain.start > 0) {
+            loops.set_arrival_factor(
+                chain.start - 1, loop_extrusion_simulator::directions::leftward, 0
+            );
+        }
+        if (chain.end < _setup.particle_count) {
+            loops.set_arrival_factor(
+                chain.end, loop_extrusion_simulator::directions::rightward, 0
+            );
+        }
+    }
+
+    _loops = std::make_shared<loop_extrusion_simulator>(loops);
+}
+
+
+void
+simulation_driver::setup_forcefield_pairwise()
+{
+    md::softcore_potential<2, 3> const repulsive_potential {
+        .energy   = _config.chain.repulsive_energy,
+        .diameter = _config.chain.repulsive_distance,
+    };
+
+    md::softcore_potential<8, 3> const attractive_potential {
+        .energy   = -_config.chain.attractive_energy,
+        .diameter = _config.chain.attractive_distance,
+    };
+
+    if (_config.chain.attractive_distance > 0 && _config.chain.attractive_energy > 0) {
+        md::scalar const neighbor_distance = std::max(
+            repulsive_potential.diameter, attractive_potential.diameter
+        );
+
+        _system.add_forcefield(
+            md::make_neighbor_pairwise_forcefield(
+                repulsive_potential + attractive_potential
+            )
+            .set_unit_cell(_setup.box)
+            .set_neighbor_distance(neighbor_distance)
+        );
+    } else {
+        _system.add_forcefield(
+            md::make_neighbor_pairwise_forcefield(repulsive_potential)
+            .set_unit_cell(_setup.box)
+            .set_neighbor_distance(repulsive_potential.diameter)
+        );
+    }
+}
+
+
+void
+simulation_driver::setup_forcefield_connectivity()
+{
+    auto bonds = _system.add_forcefield(
+        md::make_bonded_pairwise_forcefield(
+            md::spring_potential {
+                .spring_constant      = _config.chain.spring_constant,
+                .equilibrium_distance = _config.chain.spring_length,
+            }
+        )
+    );
+
+    auto angles = _system.add_forcefield(
+        md::make_bonded_triplewise_forcefield(
+            md::cosine_angle_potential {
+                .bending_energy  = _config.chain.angle_energy,
+                .preferred_angle = _config.chain.angle_preference,
+            }
+        )
+    );
+
+    for (auto const& chain : _setup.chains) {
+        bonds->add_bonded_range(chain.start, chain.end);
+        if (_config.chain.angle_energy > 0) {
+            angles->add_bonded_range(chain.start, chain.end);
+        }
+    }
+}
+
+
+void
+simulation_driver::setup_forcefield_associations()
+{
+    md::softcore_potential<8, 3> const potential {
+        .energy   = -_config.association.association_energy,
+        .diameter = _config.association.association_distance,
+    };
+
+    _system.add_forcefield(
+        activated_interaction_forcefield(_associations, potential, _setup.box)
+    );
+}
+
+
+void
+simulation_driver::setup_forcefield_loops()
+{
+    md::spring_potential const potential {
+        .spring_constant      = _config.extruder.spring_constant,
+        .equilibrium_distance = _config.extruder.spring_length,
+    };
+
+    _system.add_forcefield(
+        activated_interaction_forcefield(_loops, potential, _setup.box)
+    );
+}
+
+
+void
+simulation_driver::setup_forcefield_container()
+{
+    _system.add_forcefield(
+        md::make_sphere_outward_forcefield(
+            md::harmonic_potential {
+                .spring_constant = _config.environment.container_spring_constant
+            }
+        )
+        .set_sphere(_setup.container_sphere)
+    );
+}
+
+
+void
+simulation_driver::run()
+{
+    run_initialization_particles();
+    run_initialization_associations();
+    run_initialization_loops();
+
+    run_sampling("relaxation", _config.sampling.relaxation_steps);
+    run_sampling("production", _config.sampling.production_steps);
+}
+
+
+void
+simulation_driver::run_initialization_particles()
+{
+    auto const positions = _system.view_positions();
+
+    for (auto const& chain : _setup.chains) {
+        auto const chain_length = chain.end - chain.start;
+        auto const unit_step = _config.initialization.initial_step_monomers;
+        auto const path_length = (chain_length + unit_step - 1) / unit_step;
+        auto const path_step =
+            _config.chain.spring_length
+            * double(unit_step)
+            * _config.initialization.initial_step_scale;
+
+        std::uniform_real_distribution<md::scalar> coord(
+            -_setup.container_sphere.radius, _setup.container_sphere.radius
+        );
+        md::point centroid;
+        do {
+            md::vector const shift = {coord(_random), coord(_random), coord(_random)};
+            centroid = _setup.container_sphere.center + shift;
+        } while (md::distance(centroid, _setup.container_sphere.center) > _setup.container_sphere.radius);
+
+        std::vector<md::point> const coarse_path = generate_random_walk(path_length, path_step, _random);
+        std::vector<md::point> chain_path = interpolate_points(coarse_path, chain_length);
+        move_centroid(chain_path, centroid);
+
+        std::ranges::copy(
+            chain_path,
+            positions.subview(chain.start, chain.end - chain.start).begin()
+        );
+    }
+}
+
+
+void
+simulation_driver::run_initialization_associations()
+{
+}
+
+
+void
+simulation_driver::run_initialization_loops()
+{
+    if (!_config.initialization.extruder_preloading) {
+        return;
+    }
+
+    loop_extrusion_simulator::snapshot_type initial_state;
+    std::size_t next_id = 0;
+
+    for (auto const& chain : _setup.chains) {
+        for (std::size_t i = 0; i < chain.end - chain.start; i++) {
+            std::size_t const site = chain.start + i;
+
+            // FIXME: site-specific parameter
+            double const loading_rate = _config.extruder.loading_rate;
+            double const unloading_rate = _config.extruder.unloading_rate;
+
+            // Limit initial loading up to one for each site.
+            std::poisson_distribution<int> count_distr(loading_rate / unloading_rate);
+            if (count_distr(_random) > 0) {
+                initial_state.loops.push_back({ .id = next_id++, .site_1 = site, .site_2 = site });
+            }
+        }
+    }
+
+    _loops->load_state(initial_state);
+}
+
+
+void
+simulation_driver::run_sampling(std::string const& phase_name, md::step steps)
+{
+    auto const callback = [this, &phase_name](md::step step) {
+        if (step % _config.sampling.logging_interval == 0) {
+            auto const energy = _system.compute_energy();
+            auto const associations = _associations->active_pairs().size();
+            auto const loops = _loops->active_pairs().size();
+
+            double average_loop_size = 0;
+            for (auto const& [i, j]: _loops->active_pairs()){
+                average_loop_size += double(j - i + 1);
+            }
+            average_loop_size /= double(loops);
+
+            std::println(
+                "[{:s}] step: {:8d} | energy: {:6.4g} | assocs: {:4d} | loops: {:2d} (L={:5.1f})",
+                phase_name,
+                step,
+                energy,
+                associations,
+                loops,
+                average_loop_size
+            );
+        }
+
+        _structure.update(_system.view_positions());
+        _associations->step(_config.sampling.timestep, _structure, _random);
+        _loops->step(_config.sampling.timestep, _random);
+    };
+
+    callback(0);
+
+    md::simulate_brownian_dynamics(_system, {
+        .temperature = _config.environment.temperature,
+        .timestep    = _config.sampling.timestep,
+        .steps       = steps,
+        .seed        = _random(),
+        .callback    = callback,
+    });
+}
