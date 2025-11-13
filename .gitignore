@@ -10,3 +10,7 @@ _*
 *.h5
 *.gsd
 /src/simulation/main
+
+*.gz
+*.mcool
+*.bb
