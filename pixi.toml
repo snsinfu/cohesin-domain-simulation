@@ -1,0 +1,41 @@
+[workspace]
+authors = ["snsinfu <snsinfu@gmail.com>"]
+channels = ["conda-forge"]
+name = "domain_mixing"
+platforms = ["linux-64", "osx-arm64"]
+version = "0.1.0"
+
+# Python
+[feature.python.dependencies]
+python = "3.12.*"
+pip = "*"
+
+# C++
+[feature.cxx.dependencies]
+clangxx = "21.*"
+libcxx-devel = "21.*"
+lld = "21.*"
+make = "4.*"
+#openlibm = "0.8.*"
+#xsimd = "13.*"
+
+# Database, storage and file formats
+[feature.store.dependencies]
+h5py = "3.*"
+hdf5 = "1.*"
+
+# Notebook, media and visualization
+[feature.visual.dependencies]
+cmocean = "4.*"
+colorcet = "3.*"
+font-ttf-noto = "*"
+matplotlib-base = "3.*"
+
+# Math, numerics, data analysis and machine learning
+[feature.numerics.dependencies]
+numpy = "2.*"
+polars = "1.*"
+scipy = "1.*"
+
+[environments]
+default = ["python", "cxx", "store", "visual", "numerics"]
