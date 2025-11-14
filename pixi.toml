@@ -16,13 +16,12 @@ clangxx = "21.*"
 libcxx-devel = "21.*"
 lld = "21.*"
 make = "4.*"
-#openlibm = "0.8.*"
-#xsimd = "13.*"
 
 # Database, storage and file formats
 [feature.store.dependencies]
 h5py = "3.*"
 hdf5 = "1.*"
+gsd = "4.*"
 
 # Notebook, media and visualization
 [feature.visual.dependencies]

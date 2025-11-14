@@ -30,6 +30,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/font-ttf-noto-20201206-h77eed37_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/linux-64/fonttools-4.60.1-py312h8a5da7c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/freetype-2.14.1-ha770c72_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/gsd-4.2.0-h31e983c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/h5py-3.15.1-nompi_py312ha4f8f14_100.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/hdf5-1.14.6-nompi_h6e4c0c1_103.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/icu-75.1-he02047a_0.conda
@@ -144,6 +145,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/font-ttf-noto-20201206-h77eed37_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/fonttools-4.60.1-py312h5748b74_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/freetype-2.14.1-hce30654_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/gsd-4.2.0-h9bff6d5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/h5py-3.15.1-nompi_py312h4eecd6b_100.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/hdf5-1.14.6-nompi_he65715a_103.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/icu-75.1-hfee45f7_0.conda
@@ -623,6 +625,35 @@ packages:
   license: GPL-2.0-only OR FTL
   size: 173399
   timestamp: 1757947175403
+- conda: https://conda.anaconda.org/conda-forge/linux-64/gsd-4.2.0-h31e983c_0.conda
+  noarch: python
+  sha256: 3f996ee93db649a73ff4d9d7b5f2786c4ecd5f06664c5f57cd0fc0fd070cee94
+  md5: a976920393da8394d0eae019936fbd3d
+  depends:
+  - python
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - _python_abi3_support 1.*
+  - cpython >=3.11
+  - numpy >=1.23,<3
+  license: BSD-2-Clause
+  license_family: BSD
+  size: 238994
+  timestamp: 1759914765166
+- conda: https://conda.anaconda.org/conda-forge/osx-arm64/gsd-4.2.0-h9bff6d5_0.conda
+  noarch: python
+  sha256: 5ee41e248152131ea5e7eabc599238bd045f6d15336065cd0d7371f907510ce8
+  md5: a85f47fe676de6d9e7c9b8edf3148983
+  depends:
+  - python
+  - __osx >=11.0
+  - numpy >=1.23,<3
+  - _python_abi3_support 1.*
+  - cpython >=3.11
+  license: BSD-2-Clause
+  license_family: BSD
+  size: 226864
+  timestamp: 1759914962880
 - conda: https://conda.anaconda.org/conda-forge/linux-64/h5py-3.15.1-nompi_py312ha4f8f14_100.conda
   sha256: 5116f0aff9ae47c1ce594e4eb0d1b0b8f3b5347f91e883dff12bdbf8b782fa50
   md5: 44a8a9fe9150a6aba3c7e3845604b4ff
