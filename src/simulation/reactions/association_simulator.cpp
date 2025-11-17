@@ -104,7 +104,9 @@ association_simulator::step_association(double dt, structure_data const& structu
         auto const rate = _config.association_rate * factor;
         auto const distance = structure.distance(i, j);
 
-        if (distance < _config.association_distance && poisson_process(rate, dt, random)) {
+        if (distance <= _config.association_distance &&
+            !_associations.test(i, j) &&
+            poisson_process(rate, dt, random)) {
             candidates.push_back({i, j});
         }
     }
