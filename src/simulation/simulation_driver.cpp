@@ -208,9 +208,9 @@ simulation_driver::setup_forcefield_connectivity()
 void
 simulation_driver::setup_forcefield_associations()
 {
-    md::softcore_potential<8, 3> const potential {
-        .energy   = -_config.association.association_energy,
-        .diameter = _config.association.association_distance,
+    md::softwell_potential const potential {
+        .energy         = _config.association.association_energy,
+        .decay_distance = _config.association.association_distance,
     };
 
     _system.add_forcefield(
