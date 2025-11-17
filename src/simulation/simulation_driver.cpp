@@ -46,6 +46,7 @@ simulation_driver::setup()
     setup_forcefield_connectivity();
     setup_forcefield_associations();
     setup_forcefield_extruders();
+    setup_forcefield_container();
 }
 
 
