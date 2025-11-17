@@ -18,7 +18,7 @@
     "initialization": {
         "extruder_preloading":   true,
         "initial_step_monomers": 10,
-        "initial_step_scale":    1
+        "initial_step_scale":    0.1
     },
 
     "chain": {
@@ -30,11 +30,11 @@
     },
 
     "association": {
-        "valency":              2,
+        "valency":              3,
         "association_distance": 1.5,
         "association_rate":     100,
         "dissociation_rate":    10,
-        "association_energy":   3
+        "association_energy":   5
     },
 
     "extruder": {
@@ -42,7 +42,7 @@
         "unloading_rate":   0.05,
         "extrusion_rate":   100,
         "contraction_rate": 100,
-        "crossing_factor":  1,
+        "crossing_factor":  0,
         "spring_length":    1,
         "spring_constant":  200
     },
