@@ -25,10 +25,14 @@ OPTFLAGS = \
   -funsafe-math-optimizations
 
 INCLUDES = \
-  -isystem ../../submodules/github.com/snsinfu/micromd/include \
   -isystem ../../submodules/github.com/snsinfu/cxx-spline/include \
   -isystem ../../submodules/github.com/snsinfu/cxx-getopt \
+  -isystem ../../submodules/github.com/snsinfu/h5/include \
+  -isystem ../../submodules/github.com/snsinfu/micromd/include \
   -isystem ../../submodules/github.com/danielaparker/jsoncons/include
+
+LIBS = \
+  -lhdf5
 
 TARGET = main
 

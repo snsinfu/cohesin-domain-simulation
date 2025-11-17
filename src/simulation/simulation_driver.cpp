@@ -9,10 +9,12 @@
 #include "potentials/cosine_angle_potential.hpp"
 #include "reactions/association_simulator.hpp"
 #include "misc/point_manipulations.hpp"
+#include "misc/make_vector.hpp"
 
 
 simulation_driver::simulation_driver(simulation_config const& config)
 : _config(config)
+, _store(config.sampling.output_filename)
 , _structure({})
 {
     setup();
@@ -43,7 +45,7 @@ simulation_driver::setup()
     setup_forcefield_pairwise();
     setup_forcefield_connectivity();
     setup_forcefield_associations();
-    setup_forcefield_loops();
+    setup_forcefield_extruders();
 }
 
 
@@ -88,7 +90,7 @@ simulation_driver::setup_association_simulator()
 void
 simulation_driver::setup_loop_extrusion_simulator()
 {
-    loop_extrusion_simulator loops({
+    loop_extrusion_simulator extruders({
         .site_count       = _system.particle_count(),
         .loading_rate     = _config.extruder.loading_rate,
         .unloading_rate   = _config.extruder.unloading_rate,
@@ -113,28 +115,27 @@ simulation_driver::setup_loop_extrusion_simulator()
             for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
                 foreach_site(feature, [&](auto index, auto dir) {
                     std::size_t const site = chain.start + index;
-                    if (auto val = feature.loading) { loops.set_loading_factor(site, dir, *val); }
-                    if (auto val = feature.unloading) { loops.set_unloading_factor(site, dir, *val); }
-                    if (auto val = feature.arrival) { loops.set_arrival_factor(site, dir, *val); }
-                    if (auto val = feature.departure) { loops.set_departure_factor(site, dir, *val); }
+                    if (auto val = feature.loading) { extruders.set_loading_factor(site, dir, *val); }
+                    if (auto val = feature.unloading) { extruders.set_unloading_factor(site, dir, *val); }
+                    if (auto val = feature.arrival) { extruders.set_arrival_factor(site, dir, *val); }
+                    if (auto val = feature.departure) { extruders.set_departure_factor(site, dir, *val); }
                 });
             }
         }
 
-        // Prevent extruders from fall out of the chain.
-        if (chain.start > 0) {
-            loops.set_arrival_factor(
-                chain.start - 1, loop_extrusion_simulator::directions::leftward, 0
-            );
-        }
-        if (chain.end < _setup.particle_count) {
-            loops.set_arrival_factor(
-                chain.end, loop_extrusion_simulator::directions::rightward, 0
-            );
-        }
+        // Prevent extruders in adjacent chains from entering this chain.
+        //  >>>|         |<<<
+        // ----|---------|----
+        //     ^start     ^end
+        extruders.set_arrival_factor(
+            chain.start, loop_extrusion_simulator::directions::rightward, 0
+        );
+        extruders.set_arrival_factor(
+            chain.end - 1, loop_extrusion_simulator::directions::leftward, 0
+        );
     }
 
-    _loops = std::make_shared<loop_extrusion_simulator>(loops);
+    _extruders = std::make_shared<loop_extrusion_simulator>(extruders);
 }
 
 
@@ -218,7 +219,7 @@ simulation_driver::setup_forcefield_associations()
 
 
 void
-simulation_driver::setup_forcefield_loops()
+simulation_driver::setup_forcefield_extruders()
 {
     md::spring_potential const potential {
         .spring_constant      = _config.extruder.spring_constant,
@@ -226,7 +227,7 @@ simulation_driver::setup_forcefield_loops()
     };
 
     _system.add_forcefield(
-        activated_interaction_forcefield(_loops, potential, _setup.box)
+        activated_interaction_forcefield(_extruders, potential, _setup.box)
     );
 }
 
@@ -250,7 +251,7 @@ simulation_driver::run()
 {
     run_initialization_particles();
     run_initialization_associations();
-    run_initialization_loops();
+    run_initialization_extruders();
 
     run_sampling("relaxation", _config.sampling.relaxation_steps);
     run_sampling("production", _config.sampling.production_steps);
@@ -295,11 +296,12 @@ simulation_driver::run_initialization_particles()
 void
 simulation_driver::run_initialization_associations()
 {
+    // No explicit initialization; equilibrated in the relaxation phase.
 }
 
 
 void
-simulation_driver::run_initialization_loops()
+simulation_driver::run_initialization_extruders()
 {
     if (!_config.initialization.extruder_preloading) {
         return;
@@ -324,39 +326,26 @@ simulation_driver::run_initialization_loops()
         }
     }
 
-    _loops->load_state(initial_state);
+    _extruders->load_state(initial_state);
 }
 
 
 void
 simulation_driver::run_sampling(std::string const& phase_name, md::step steps)
 {
+    save_metadata(phase_name);
+
     auto const callback = [this, &phase_name](md::step step) {
         if (step % _config.sampling.logging_interval == 0) {
-            auto const energy = _system.compute_energy();
-            auto const associations = _associations->active_pairs().size();
-            auto const loops = _loops->active_pairs().size();
-
-            double average_loop_size = 0;
-            for (auto const& [i, j]: _loops->active_pairs()){
-                average_loop_size += double(j - i + 1);
-            }
-            average_loop_size /= double(loops);
-
-            std::println(
-                "[{:s}] step: {:8d} | energy: {:6.4g} | assocs: {:4d} | loops: {:2d} (L={:5.1f})",
-                phase_name,
-                step,
-                energy,
-                associations,
-                loops,
-                average_loop_size
-            );
+            show_progress(phase_name, step);
+        }
+        if (step % _config.sampling.sampling_interval == 0) {
+            save_sample(phase_name, step);
         }
 
         _structure.update(_system.view_positions());
         _associations->step(_config.sampling.timestep, _structure, _random);
-        _loops->step(_config.sampling.timestep, _random);
+        _extruders->step(_config.sampling.timestep, _random);
     };
 
     callback(0);
@@ -367,5 +356,63 @@ simulation_driver::run_sampling(std::string const& phase_name, md::step steps)
         .steps       = steps,
         .seed        = _random(),
         .callback    = callback,
+    });
+}
+
+
+void
+simulation_driver::show_progress(std::string const& phase_name, md::step step)
+{
+    double const energy = _system.compute_energy();
+    std::size_t const associations = _associations->active_pairs().size();
+    std::size_t const extruders = _extruders->active_pairs().size();
+
+    double average_loop_size = 0;
+    for (auto const& [i, j]: _extruders->active_pairs()){
+        average_loop_size += double(j - i + 1);
+    }
+    average_loop_size /= double(extruders);
+
+    std::println(
+        "[{:s}] step: {:8d}"
+            " | energy: {:6.4g}"
+            " | assocs: {:4d}"
+            " | loops: {:2d} (L={:5.1f})",
+        phase_name,
+        step,
+        energy,
+        associations,
+        extruders,
+        average_loop_size
+    );
+}
+
+
+void
+simulation_driver::save_sample(std::string const& phase_name, md::step step)
+{
+    _store.save_snapshot(phase_name, {
+        .step         = step,
+        .positions    = make_vector(_system.view_positions()),
+        .associations = _associations->dump_state(),
+        .extruders    = _extruders->dump_state(),
+    });
+}
+
+
+void
+simulation_driver::save_metadata(std::string const& phase_name)
+{
+    std::vector<simulation_store::metadata_record::chain_record> chains;
+    for (auto const& chain : _setup.chains) {
+        chains.push_back({
+            .start = chain.start,
+            .end   = chain.end,
+        });
+    }
+
+    _store.save_metadata(phase_name, {
+        .config = _config,
+        .chains = chains,
     });
 }

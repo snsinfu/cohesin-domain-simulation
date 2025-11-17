@@ -7,6 +7,7 @@
 #include <md.hpp>
 
 #include "simulation_config.hpp"
+#include "simulation_store.hpp"
 #include "reactions/association_simulator.hpp"
 #include "reactions/loop_extrusion_simulator.hpp"
 
@@ -39,20 +40,25 @@ private:
     void setup_forcefield_pairwise();
     void setup_forcefield_connectivity();
     void setup_forcefield_associations();
-    void setup_forcefield_loops();
+    void setup_forcefield_extruders();
     void setup_forcefield_container();
 
     void run_initialization_particles();
     void run_initialization_associations();
-    void run_initialization_loops();
+    void run_initialization_extruders();
     void run_sampling(std::string const& phase_name, md::step step);
+
+    void show_progress(std::string const& phase_name, md::step step);
+    void save_sample(std::string const& phase_name, md::step step);
+    void save_metadata(std::string const& phase_name);
 
 private:
     simulation_config                         _config;
     simulation_setup                          _setup;
+    simulation_store                          _store;
     md::system                                _system;
     random_engine                             _random;
     structure_data                            _structure;
     std::shared_ptr<association_simulator>    _associations;
-    std::shared_ptr<loop_extrusion_simulator> _loops;
+    std::shared_ptr<loop_extrusion_simulator> _extruders;
 };
