@@ -158,7 +158,24 @@ class ChromatinMod(TopologyMod):
 
 
 class CohesinMod(TopologyMod):
+    PARTICLE_TYPE = "cohesin"
     BOND_TYPE = "cohesin"
+
+    def derive_particles(
+        self,
+        metadata: h5py.Group,
+        snapshot: h5py.Group,
+    ) -> ParticlesData:
+        positions = snapshot["positions"][:]
+        cohesin_bonds = [(i, j) for i, j in snapshot["extruders/sites"]]
+        cohesin_positions = np.array([
+            (positions[i] + positions[j]) / 2 for i, j in cohesin_bonds
+        ])
+        return ParticlesData(
+            type_ids=([0] * len(cohesin_positions)),
+            type_names=[self.PARTICLE_TYPE],
+            positions=cohesin_positions,
+        )
 
     def derive_bonds(
         self,
