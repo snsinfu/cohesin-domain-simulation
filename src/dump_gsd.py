@@ -168,9 +168,12 @@ class CohesinMod(TopologyMod):
     ) -> ParticlesData:
         positions = snapshot["positions"][:]
         cohesin_bonds = [(i, j) for i, j in snapshot["extruders/sites"]]
-        cohesin_positions = np.array([
-            (positions[i] + positions[j]) / 2 for i, j in cohesin_bonds
-        ])
+        cohesin_positions = np.reshape(
+            [(positions[i] + positions[j]) / 2 for i, j in cohesin_bonds],
+            (-1, DIMENSION),
+            # Note: This array has to be rank-2 (0, dim) even when there
+            # is no cohesin.
+        )
         return ParticlesData(
             type_ids=([0] * len(cohesin_positions)),
             type_names=[self.PARTICLE_TYPE],
