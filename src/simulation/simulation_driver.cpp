@@ -312,16 +312,25 @@ simulation_driver::run_initialization_extruders()
     std::size_t next_id = 0;
 
     for (auto const& chain : _setup.chains) {
+
+        std::vector<double> affinity_mods(chain.end - chain.start, 1);
+        for (auto const& feature : chain.config.extruder_features) {
+            for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
+                if (auto val = feature.loading) { affinity_mods[i] *= *val; }
+                if (auto val = feature.unloading) { affinity_mods[i] /= *val; }
+            }
+        }
+
         for (std::size_t i = 0; i < chain.end - chain.start; i++) {
             std::size_t const site = chain.start + i;
 
-            // FIXME: site-specific parameter
-            double const loading_rate = _config.extruder.loading_rate;
-            double const unloading_rate = _config.extruder.unloading_rate;
+            double const affinity = affinity_mods[i]
+                * _config.extruder.loading_rate
+                / _config.extruder.unloading_rate;
 
             // Limit initial loading up to one for each site.
-            std::poisson_distribution<int> count_distr(loading_rate / unloading_rate);
-            if (count_distr(_random) > 0) {
+            std::poisson_distribution<int> count_distr(affinity);
+            if (std::isinf(affinity) || count_distr(_random) > 0) {
                 initial_state.loops.push_back({ .id = next_id++, .site_1 = site, .site_2 = site });
             }
         }
