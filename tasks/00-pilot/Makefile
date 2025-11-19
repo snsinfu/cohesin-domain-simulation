@@ -20,4 +20,4 @@ _outputs/output-%.h5: config-%.json
 	$(SIMULATION) -o $@ $<
 
 _outputs/%.gsd: _outputs/%.h5
-	$(DUMP_GSD) --phase relaxation $< $@
+	$(DUMP_GSD) --phase production $< $@
