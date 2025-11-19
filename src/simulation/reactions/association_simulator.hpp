@@ -40,6 +40,7 @@ public:
 
     void set_association_factor(std::size_t site, double factor);
     void set_dissociation_factor(std::size_t site, double factor);
+    void set_valency(std::size_t site, std::size_t valency);
 
     void step(double dt, structure_data const& structure, random_engine& random);
 
@@ -53,6 +54,7 @@ private:
 
     struct site_data
     {
+        std::size_t valency             = std::size_t(-1); // no limit
         std::size_t occupancy           = 0;
         double      association_factor  = 1;
         double      dissociation_factor = 1;

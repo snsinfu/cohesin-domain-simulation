@@ -22,7 +22,7 @@ namespace
 
 
 association_simulator::association_simulator(config_type const& config)
-: _sites(config.site_count)
+: _sites(config.site_count, { .valency = config.valency })
 , _associations(config.site_count)
 , _config(config)
 {
@@ -55,6 +55,14 @@ association_simulator::set_dissociation_factor(std::size_t site, double factor)
 
 
 void
+association_simulator::set_valency(std::size_t site, std::size_t valency)
+{
+    _sites[site].valency = valency;
+}
+
+
+
+void
 association_simulator::step(double dt, structure_data const& structure, random_engine& random)
 {
     step_dissociation(dt, structure, random);
@@ -84,8 +92,7 @@ association_simulator::step_dissociation(double dt, structure_data const&, rando
 void
 association_simulator::step_association(double dt, structure_data const& structure, random_engine& random)
 {
-    if (_config.valency == 0 ||
-        _config.association_rate == 0 ||
+    if (_config.association_rate == 0 ||
         _config.association_distance == 0) {
         return; // Avoid the hot loop below if possible.
     }
@@ -114,8 +121,8 @@ association_simulator::step_association(double dt, structure_data const& structu
     std::ranges::shuffle(candidates, random);
 
     for (auto const& [i, j] : candidates) {
-        if (_sites[i].occupancy == _config.valency ||
-            _sites[j].occupancy == _config.valency) {
+        if (_sites[i].occupancy == _sites[i].valency ||
+            _sites[j].occupancy == _sites[j].valency) {
             continue;
         }
         _associations.set(i, j);

@@ -94,9 +94,10 @@ inline counting_iterator<md::index> end(site_range const& r) { return counting_i
 /** Chain feature for overriding association parameters. */
 struct association_feature_config
 {
-    site_range                site;
-    std::optional<md::scalar> association;
-    std::optional<md::scalar> dissociation;
+    site_range                   site;
+    std::optional<md::scalar>    association;
+    std::optional<md::scalar>    dissociation;
+    std::optional<std::uint32_t> valency;
 };
 
 

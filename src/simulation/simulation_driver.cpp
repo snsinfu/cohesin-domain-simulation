@@ -79,6 +79,7 @@ simulation_driver::setup_association_simulator()
 
                 if (auto val = feature.association) { associations.set_association_factor(site, *val); }
                 if (auto val = feature.dissociation) { associations.set_dissociation_factor(site, *val); }
+                if (auto val = feature.valency) { associations.set_valency(site, *val); }
             }
         }
     }

@@ -146,7 +146,8 @@ JSONCONS_N_MEMBER_TRAITS(
 
     // Optional fields
     association,
-    dissociation
+    dissociation,
+    valency
 )
 
 
