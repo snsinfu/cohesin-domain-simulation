@@ -1,0 +1,90 @@
+{
+    "sampling": {
+        "timestep":          1e-5,
+        "relaxation_steps":  10e5,
+        "production_steps":  20e5,
+        "logging_interval":  100000,
+        "sampling_interval": 10000,
+        "random_seed":       0,
+        "output_filename":   "_output.h5"
+    },
+
+    "environment": {
+        "temperature":               1,
+        "container_radius":          10,
+        "container_spring_constant": 0
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    200
+    },
+
+    "association": {
+        "valency":              4,
+        "association_distance": 1.5,
+        "association_rate":     1000,
+        "dissociation_rate":    100,
+        "association_energy":   3
+    },
+
+    "extruder": {
+        "loading_rate":     0.0005,
+        "unloading_rate":   0.05,
+        "extrusion_rate":   101,
+        "contraction_rate": 100,
+        "crossing_factor":  0,
+        "spring_length":    1,
+        "spring_constant":  200
+    },
+
+    "chains": [
+        {
+            "length": 500,
+
+            "association_features": [
+                {"site": {"start":  10, "end":  31}, "valency": 2},
+                {"site": {"start":  50, "end":  71}, "valency": 2},
+                {"site": {"start":  90, "end": 111}, "valency": 2},
+                {"site": {"start": 180, "end": 201}, "valency": 2},
+                {"site": {"start": 210, "end": 231}, "valency": 2},
+                {"site": {"start": 280, "end": 341}, "valency": 2},
+                {"site": {"start": 470, "end": 491}, "valency": 2},
+
+                {"site": {"start": 201, "end": 210}, "valency": 2}
+            ],
+
+            "extruder_features": [
+                {"site": {"start":  10, "end":  31}, "loading": 5},
+                {"site": {"start":  50, "end":  71}, "loading": 5},
+                {"site": {"start":  90, "end": 111}, "loading": 5},
+                {"site": {"start": 180, "end": 201}, "loading": 5},
+                {"site": {"start": 210, "end": 231}, "loading": 5},
+                {"site": {"start": 280, "end": 341}, "loading": 5},
+                {"site": {"start": 470, "end": 491}, "loading": 5},
+                {"site":  10, "loading": 0, "arrival": 0},
+                {"site": 200, "loading": 0, "arrival": 0},
+                {"site": 210, "loading": 0, "arrival": 0},
+                {"site": 490, "loading": 0, "arrival": 0}
+            ],
+
+            "_notes": [
+                "Domains: D1 [10, 200], D2 [210, 490]",
+                "D1 active region: 10-30, 50-70, 90-110, 180-200",
+                "D2 active region: 210-230, 280-340, 470-490",
+                "0.1x association and 5x loading on active regions",
+                "0.1x association on domain linker",
+                "No loading and arrival at domain boundaries"
+            ]
+        }
+    ]
+}
