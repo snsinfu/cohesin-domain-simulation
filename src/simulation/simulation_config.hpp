@@ -27,7 +27,7 @@ struct sampling_config
 struct environment_config
 {
     md::scalar temperature               = 1;
-    md::scalar container_radius          = 1;
+    md::scalar container_radius          = 0;
     md::scalar container_spring_constant = 0;
 };
 
