@@ -1,0 +1,62 @@
+{
+    "meta": {
+        "parameter_ranges": {
+            "chain_length:logint":            [50, 500],
+            "association_valency:int":        [1, 10],
+            "association_rate:logreal":       [1e1, 1e4],
+            "association_constant:logreal":   [1e0, 1e2],
+            "association_energy:real":        [0, 5],
+            "extruder_loading_constant:real": [0, 5]
+        },
+        "config_seed":  0,
+        "config_count": 10
+    },
+
+    "sampling": {
+        "timestep":          1e-5,
+        "relaxation_steps":  5000000,
+        "production_steps":  5000000,
+        "logging_interval":  100000,
+        "sampling_interval": 10000,
+        "random_seed":       null,
+        "output_filename":   null
+    },
+
+    "environment": {
+        "temperature": 1
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    200
+    },
+
+    "association": {
+        "valency":              null,
+        "association_distance": 1.5,
+        "association_rate":     null,
+        "dissociation_rate":    null,
+        "association_energy":   null
+    },
+
+    "extruder": {
+        "loading_rate":     null,
+        "unloading_rate":   0.05,
+        "extrusion_rate":   201,
+        "contraction_rate": 200,
+        "crossing_factor":  0,
+        "spring_length":    1,
+        "spring_constant":  200
+    },
+
+    "chains": null
+}
