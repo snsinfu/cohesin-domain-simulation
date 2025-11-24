@@ -19,7 +19,7 @@
         "logging_interval":  100000,
         "sampling_interval": 10000,
         "random_seed":       null,
-        "output_filename":   null
+        "output_filename":   "_output.h5"
     },
 
     "environment": {
