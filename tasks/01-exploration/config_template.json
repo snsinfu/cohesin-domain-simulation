@@ -1,15 +1,15 @@
 {
     "meta": {
         "parameter_ranges": {
-            "chain_length:logint":            [50, 500],
-            "association_valency:int":        [1, 10],
-            "association_rate:logreal":       [1e1, 1e4],
-            "association_constant:logreal":   [1e0, 1e2],
-            "association_energy:real":        [0, 5],
-            "extruder_loading_constant:real": [0, 5]
+            "chain_length:logint":               [50, 500],
+            "association_valency:int":           [1, 10],
+            "association_rate:logreal":          [1e1, 1e4],
+            "association_constant:logreal":      [1e0, 1e2],
+            "association_energy:real":           [0, 5],
+            "extruder_loading_constant:logreal": [1e-3, 1e-1]
         },
         "config_seed":  0,
-        "config_count": 10
+        "config_count": 500
     },
 
     "sampling": {
