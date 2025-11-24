@@ -199,7 +199,7 @@ def dump_trajectory(
     mod: TopologyMod,
 ):
     metadata = store["metadata"]
-    box_shape = derive_box_shape(metadata)
+    box_shape = derive_box_shape(store, metadata)
 
     # Dump all snapshots.
     for step in store[".steps"]:
@@ -221,15 +221,27 @@ def dump_trajectory(
         traj.append(make_hoomd_frame(frame_data))
 
 
-def derive_box_shape(metadata: h5py.Group) -> tuple[float, float, float]:
+def derive_box_shape(store: h5py.Group, metadata: h5py.Group) -> tuple[float, float, float]:
     config = load_config(metadata)
-    radius = config["environment"]["container_radius"]
-    diameter = 2 * radius
-    return (diameter, diameter, diameter)
+    radius = config["environment"].get("container_radius")
+    if radius:
+        width = 2 * radius
+    else:
+        width = estimate_box_width(store)
+    return (width, width, width)
 
 
 def load_config(metadata: h5py.Group) -> dict:
     return json.loads(metadata["config"][()])
+
+
+def estimate_box_width(store: h5py.Group) -> float:
+    width = 0
+    for step in store[".steps"]:
+        min_coords = np.min(store[step]["positions"], axis=0)
+        max_coords = np.max(store[step]["positions"], axis=0)
+        width = max(width, np.max(max_coords - min_coords))
+    return width
 
 
 @dataclass
