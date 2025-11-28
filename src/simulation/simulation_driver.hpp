@@ -46,11 +46,11 @@ private:
     void run_initialization_particles();
     void run_initialization_associations();
     void run_initialization_extruders();
-    void run_sampling(std::string const& phase_name, md::step step);
+    void run_sampling(phase_config const& phase);
 
     void show_progress(std::string const& phase_name, md::step step);
     void save_sample(std::string const& phase_name, md::step step);
-    void save_metadata(std::string const& phase_name);
+    void save_metadata();
 
 private:
     simulation_config                         _config;

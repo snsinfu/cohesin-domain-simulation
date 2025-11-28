@@ -10,16 +10,26 @@
 #include "misc/counting_iterator.hpp"
 
 
-/** Sampling. */
+/** Sampling phase. */
+struct phase_config
+{
+    std::string               name;
+    md::step                  steps;
+    std::optional<md::scalar> timestep;
+    std::optional<md::step>   logging_interval;
+    std::optional<md::step>   sampling_interval;
+};
+
+
+/** Configuration object for the entire simulation. */
 struct sampling_config
 {
-    md::scalar    timestep          = 0;
-    md::step      relaxation_steps  = 0;
-    md::step      production_steps  = 0;
-    md::step      logging_interval  = 1;
-    md::step      sampling_interval = 1;
-    std::uint64_t random_seed       = 0;
-    std::string   output_filename;
+    md::scalar                timestep          = 1;
+    md::step                  logging_interval  = 0;
+    md::step                  sampling_interval = 0;
+    std::uint64_t             random_seed       = 0;
+    std::string               output_filename;
+    std::vector<phase_config> phases;
 };
 
 

@@ -8,6 +8,20 @@
 
 
 JSONCONS_N_MEMBER_TRAITS(
+    phase_config,
+
+    // Required fields
+    2,
+    name,
+    steps,
+
+    // Optional fields
+    timestep,
+    logging_interval,
+    sampling_interval
+)
+
+JSONCONS_N_MEMBER_TRAITS(
     sampling_config,
 
     // Required fields
@@ -15,12 +29,11 @@ JSONCONS_N_MEMBER_TRAITS(
 
     // Optional fields
     timestep,
-    relaxation_steps,
-    production_steps,
     logging_interval,
     sampling_interval,
     random_seed,
-    output_filename
+    output_filename,
+    phases
 )
 
 

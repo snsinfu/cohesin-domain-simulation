@@ -18,6 +18,7 @@ simulation_driver::simulation_driver(simulation_config const& config)
 , _structure({})
 {
     setup();
+    save_metadata();
 }
 
 
@@ -255,8 +256,9 @@ simulation_driver::run()
     run_initialization_associations();
     run_initialization_extruders();
 
-    run_sampling("relaxation", _config.sampling.relaxation_steps);
-    run_sampling("production", _config.sampling.production_steps);
+    for (phase_config const& phase : _config.sampling.phases) {
+        run_sampling(phase);
+    }
 }
 
 
@@ -342,28 +344,31 @@ simulation_driver::run_initialization_extruders()
 
 
 void
-simulation_driver::run_sampling(std::string const& phase_name, md::step steps)
+simulation_driver::run_sampling(phase_config const& phase)
 {
-    save_metadata(phase_name);
+    md::step const steps = phase.steps;
+    md::step const sampling_interval = phase.sampling_interval.value_or(_config.sampling.sampling_interval);
+    md::step const logging_interval = phase.logging_interval.value_or(_config.sampling.logging_interval);
+    md::scalar const timestep = phase.timestep.value_or(_config.sampling.timestep);
 
-    auto const callback = [this, &phase_name](md::step step) {
-        if (step % _config.sampling.logging_interval == 0) {
-            show_progress(phase_name, step);
+    auto const callback = [&, this](md::step step) {
+        if (logging_interval > 0 && step % logging_interval == 0) {
+            show_progress(phase.name, step);
         }
-        if (step % _config.sampling.sampling_interval == 0) {
-            save_sample(phase_name, step);
+        if (sampling_interval > 0 && step % sampling_interval == 0) {
+            save_sample(phase.name, step);
         }
 
         _structure.update(_system.view_positions());
-        _associations->step(_config.sampling.timestep, _structure, _random);
-        _extruders->step(_config.sampling.timestep, _random);
+        _associations->step(timestep, _structure, _random);
+        _extruders->step(timestep, _random);
     };
 
     callback(0);
 
     md::simulate_brownian_dynamics(_system, {
         .temperature = _config.environment.temperature,
-        .timestep    = _config.sampling.timestep,
+        .timestep    = timestep,
         .steps       = steps,
         .seed        = _random(),
         .callback    = callback,
@@ -412,7 +417,7 @@ simulation_driver::save_sample(std::string const& phase_name, md::step step)
 
 
 void
-simulation_driver::save_metadata(std::string const& phase_name)
+simulation_driver::save_metadata()
 {
     std::vector<simulation_store::metadata_record::chain_record> chains;
     for (auto const& chain : _setup.chains) {
@@ -422,7 +427,7 @@ simulation_driver::save_metadata(std::string const& phase_name)
         });
     }
 
-    _store.save_metadata(phase_name, {
+    _store.save_metadata({
         .config = _config,
         .chains = chains,
     });

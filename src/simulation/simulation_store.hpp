@@ -36,7 +36,7 @@ public:
 
     explicit simulation_store(std::string const& filename);
 
-    void save_metadata(std::string const& phase_name, metadata_record const& metadata);
+    void save_metadata(metadata_record const& metadata);
     void save_snapshot(std::string const& phase_name, snapshot_record const& snapshot);
 
 private:

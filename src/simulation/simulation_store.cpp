@@ -14,9 +14,9 @@ simulation_store::simulation_store(std::string const& filename)
 }
 
 void
-simulation_store::save_metadata(std::string const& phase_name, metadata_record const& metadata)
+simulation_store::save_metadata(metadata_record const& metadata)
 {
-    std::string const path_root = phase_name + "/metadata";
+    std::string const path_root = "metadata";
     std::string const path_config = path_root + "/config";
     std::string const path_config_source = path_root + "/config_source";
     std::string const path_chain_ranges = path_root + "/chains/ranges";
@@ -35,8 +35,8 @@ void
 simulation_store::save_snapshot(std::string const& phase_name, snapshot_record const& snapshot)
 {
     std::string const step_key = std::to_string(snapshot.step);
-    std::string const path_base = phase_name + "/" + step_key;
-    std::string const path_steps = phase_name + "/.steps";
+    std::string const path_base = "phases/" + phase_name + "/" + step_key;
+    std::string const path_steps = "phases/" + phase_name + "/.steps";
 
     do_save_positions(path_base, snapshot);
     do_save_associations(path_base, snapshot);
