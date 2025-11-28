@@ -22,7 +22,7 @@ def main(
     phase: str = "production",
 ):
     with h5py.File(input_filename, "r") as store:
-        phase_store = store[phase]
+        phase_store = store["phases"][phase]
         mod = CombinedMod(ChromatinMod(), CohesinMod())
 
         with gsd.fl.open(output_filename, "w", **GSD_SCHEMA) as output:
@@ -198,7 +198,7 @@ def dump_trajectory(
     traj: gsd.hoomd.HOOMDTrajectory,
     mod: TopologyMod,
 ):
-    metadata = store["metadata"]
+    metadata = store["/metadata"]
     box_shape = derive_box_shape(store, metadata)
 
     # Dump all snapshots.
