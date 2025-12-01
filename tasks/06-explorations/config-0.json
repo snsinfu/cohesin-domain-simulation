@@ -1,0 +1,36 @@
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ]
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              1,
+        "association_distance": 1.5,
+        "association_rate":     10,
+        "dissociation_rate":    0.1,
+        "association_energy":   5
+    },
+
+    "chains": [
+        {"length": 200}
+    ]
+}
