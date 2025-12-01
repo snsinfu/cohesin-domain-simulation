@@ -81,7 +81,7 @@ struct association_type_config
 struct extruder_type_config
 {
     md::scalar loading_rate     = 0;
-    md::scalar unloading_rate   = 0;
+    md::scalar unloading_rate   = 1;
     md::scalar extrusion_rate   = 0;
     md::scalar contraction_rate = 0;
     md::scalar crossing_factor  = 1;
