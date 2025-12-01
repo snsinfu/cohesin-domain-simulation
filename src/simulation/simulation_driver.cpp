@@ -390,14 +390,14 @@ simulation_driver::show_progress(std::string const& phase_name, md::step step)
     }
     average_loop_size /= double(extruders);
 
-    std::cout
+    std::clog
         << "[" << phase_name << "]"
         << " step: " << std::setw(8) << step
-        << "| energy:" << std::setw(6) << std::setprecision(4) << energy
-        << "| assocs: " << std::setw(4) << associations
-        << "| loops: " << std::setw(2) << extruders
+        << " | energy: " << std::setw(6) << std::setprecision(4) << energy
+        << " | assocs: " << std::setw(4) << associations
+        << " | loops: " << std::setw(2) << extruders
         << " (L=" << std::setw(5) <<  average_loop_size << ")"
-        << '\n';
+        << std::endl;
 }
 
 
