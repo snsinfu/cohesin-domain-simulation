@@ -427,8 +427,19 @@ simulation_driver::save_metadata()
         });
     }
 
+    std::vector<simulation_store::metadata_record::particle_record> particles;
+    for (std::size_t site_index = 0; site_index < _associations->site_count(); site_index++) {
+        auto const& site_data = _associations->get_site_data(site_index);
+        particles.push_back({
+            .valency = site_data.valency,
+            .association_factor = site_data.association_factor,
+            .dissociation_factor = site_data.dissociation_factor,
+        });
+    }
+
     _store.save_metadata({
-        .config = _config,
-        .chains = chains,
+        .config    = _config,
+        .chains    = chains,
+        .particles = particles,
     });
 }

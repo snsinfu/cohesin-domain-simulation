@@ -9,6 +9,8 @@
 
 namespace
 {
+    using site_data = association_simulator::site_data;
+
     inline double
     mix_association_factor(double factor_i, double factor_j) {
         return std::sqrt(factor_i * factor_j);
@@ -58,6 +60,20 @@ void
 association_simulator::set_valency(std::size_t site, std::size_t valency)
 {
     _sites[site].valency = valency;
+}
+
+
+site_data const&
+association_simulator::get_site_data(std::size_t site) const
+{
+    return _sites[site];
+}
+
+
+std::size_t
+association_simulator::site_count() const
+{
+    return _sites.size();
 }
 
 

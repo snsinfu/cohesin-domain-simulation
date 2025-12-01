@@ -34,13 +34,23 @@ public:
         std::vector<association_record> associations;
     };
 
+    struct site_data
+    {
+        std::size_t valency             = std::size_t(-1); // no limit
+        std::size_t occupancy           = 0;
+        double      association_factor  = 1;
+        double      dissociation_factor = 1;
+    };
+
     explicit association_simulator(config_type const& config);
 
     sized_iterator_range<active_iterator> active_pairs() const;
 
-    void set_association_factor(std::size_t site, double factor);
-    void set_dissociation_factor(std::size_t site, double factor);
-    void set_valency(std::size_t site, std::size_t valency);
+    void             set_association_factor(std::size_t site, double factor);
+    void             set_dissociation_factor(std::size_t site, double factor);
+    void             set_valency(std::size_t site, std::size_t valency);
+    site_data const& get_site_data(std::size_t site) const;
+    std::size_t      site_count() const;
 
     void step(double dt, structure_data const& structure, random_engine& random);
 
@@ -52,13 +62,6 @@ private:
     void step_dissociation(double dt, structure_data const& structure, random_engine& random);
     void step_association(double dt, structure_data const& structure, random_engine& random);
 
-    struct site_data
-    {
-        std::size_t valency             = std::size_t(-1); // no limit
-        std::size_t occupancy           = 0;
-        double      association_factor  = 1;
-        double      dissociation_factor = 1;
-    };
     using site_pair = std::pair<std::size_t, std::size_t>;
 
 private:

@@ -22,8 +22,16 @@ public:
             md::index end;
         };
 
-        simulation_config         config;
-        std::vector<chain_record> chains;
+        struct particle_record
+        {
+            md::index  valency;
+            md::scalar association_factor;
+            md::scalar dissociation_factor;
+        };
+
+        simulation_config            config;
+        std::vector<chain_record>    chains;
+        std::vector<particle_record> particles;
     };
 
     struct snapshot_record
