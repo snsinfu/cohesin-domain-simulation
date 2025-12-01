@@ -1,0 +1,62 @@
+{
+    "sampling": {
+        "timestep":          1e-5,
+        "relaxation_steps":  2000000,
+        "production_steps":  2000000,
+        "logging_interval":  100000,
+        "sampling_interval": 100,
+        "random_seed":       0,
+        "output_filename":   "_output.h5"
+    },
+
+    "environment": {
+        "temperature": 1
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    200
+    },
+
+    "association": {
+        "valency":              4,
+        "association_distance": 1.5,
+        "association_rate":     1000,
+        "dissociation_rate":    100,
+        "association_energy":   3
+    },
+
+    "extruder": {
+        "loading_rate":     0.0005,
+        "unloading_rate":   0.05,
+        "extrusion_rate":   201,
+        "contraction_rate": 200,
+        "crossing_factor":  0,
+        "spring_length":    1,
+        "spring_constant":  200
+    },
+
+    "chains": [
+        {
+            "length": 400,
+
+            "association_features": [
+                {"site": {"start": 199, "end": 202}, "valency": 0, "@what": "domain linker"}
+            ],
+
+            "extruder_features": [
+                {"site": 198, "loading": 0, "arrival": 0, "@what": "domain boundary"},
+                {"site": 202, "loading": 0, "arrival": 0, "@what": "domain boundary"}
+            ]
+        }
+    ]
+}

@@ -1,0 +1,109 @@
+
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":       0,
+        "output_filename":   "_output.h5"
+    },
+
+    "environment": {
+        "temperature": 1
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              3,
+        "association_distance": 1.5,
+        "association_rate":     100,
+        "dissociation_rate":    10,
+        "association_energy":   3
+    },
+
+    "extruder": {
+        "loading_rate":     1e-5,
+        "unloading_rate":   1e-3,
+        "extrusion_rate":   30.1,
+        "contraction_rate": 30.0,
+        "crossing_factor":  0,
+        "spring_length":    1,
+        "spring_constant":  200
+    },
+
+    "chains": [
+        {
+            "length": 400,
+
+            "association_features": [
+                {"site": {"start":  25, "end":  26}, "valency": 1},
+                {"site": {"start":  35, "end":  37}, "valency": 1},
+                {"site": {"start":  40, "end":  41}, "valency": 1},
+                {"site": {"start":  52, "end":  53}, "valency": 1},
+                {"site": {"start":  56, "end":  65}, "valency": 1},
+                {"site": {"start":  75, "end":  83}, "valency": 1},
+                {"site": {"start":  97, "end":  99}, "valency": 1},
+                {"site": {"start": 104, "end": 105}, "valency": 1},
+                {"site": {"start": 109, "end": 110}, "valency": 1},
+                {"site": {"start": 112, "end": 117}, "valency": 1},
+                {"site": {"start": 124, "end": 125}, "valency": 1},
+                {"site": {"start": 128, "end": 129}, "valency": 1},
+                {"site": {"start": 132, "end": 133}, "valency": 1},
+                {"site": {"start": 134, "end": 135}, "valency": 1},
+                {"site": {"start": 141, "end": 142}, "valency": 1},
+                {"site": {"start": 152, "end": 155}, "valency": 1},
+                {"site": {"start": 169, "end": 171}, "valency": 1},
+                {"site": {"start": 172, "end": 173}, "valency": 1},
+                {"site": {"start": 186, "end": 187}, "valency": 1},
+                {"site": {"start": 199, "end": 200}, "valency": 1},
+
+                {"site": {"start": 200, "end": 203}, "valency": 1},
+                {"site": {"start": 208, "end": 209}, "valency": 1},
+                {"site": {"start": 213, "end": 214}, "valency": 1},
+                {"site": {"start": 219, "end": 220}, "valency": 1},
+                {"site": {"start": 226, "end": 227}, "valency": 1},
+                {"site": {"start": 235, "end": 239}, "valency": 1},
+                {"site": {"start": 242, "end": 243}, "valency": 1},
+                {"site": {"start": 256, "end": 257}, "valency": 1},
+                {"site": {"start": 271, "end": 272}, "valency": 1},
+                {"site": {"start": 291, "end": 299}, "valency": 1},
+                {"site": {"start": 300, "end": 303}, "valency": 1},
+                {"site": {"start": 312, "end": 313}, "valency": 1},
+                {"site": {"start": 323, "end": 324}, "valency": 1},
+                {"site": {"start": 325, "end": 327}, "valency": 1},
+                {"site": {"start": 328, "end": 330}, "valency": 1},
+                {"site": {"start": 331, "end": 332}, "valency": 1},
+                {"site": {"start": 340, "end": 341}, "valency": 1},
+                {"site": {"start": 344, "end": 347}, "valency": 1},
+                {"site": {"start": 350, "end": 351}, "valency": 1},
+                {"site": {"start": 368, "end": 369}, "valency": 1},
+                {"site": {"start": 379, "end": 381}, "valency": 1},
+                {"site": {"start": 396, "end": 398}, "valency": 1},
+
+                {"site": {"start": 199, "end": 202}, "valency": 1, "@what": "domain linker"}
+
+            ],
+
+            "extruder_features": [
+                {"site": 198, "loading": 0, "arrival": 0, "@what": "domain boundary"},
+                {"site": 202, "loading": 0, "arrival": 0, "@what": "domain boundary"}
+            ]
+        }
+    ]
+}
