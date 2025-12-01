@@ -12,7 +12,7 @@ DBGFLAGS = \
   -g
 
 WARNFLAGS = \
-  -std=c++23 \
+  -std=c++20 \
   -Wpedantic \
   -Wall \
   -Wextra \

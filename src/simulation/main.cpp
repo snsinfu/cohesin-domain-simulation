@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <exception>
+#include <iostream>
 #include <optional>
-#include <print>
 #include <stdexcept>
 #include <string>
 
@@ -55,7 +55,7 @@ main(int argc, char** argv)
 
         return 0;
     } catch (std::exception const& err) {
-        std::println(stderr, "error: {}", err.what());
+        std::cerr << "error: " << err.what() << '\n';
         return 1;
     }
 }
@@ -64,8 +64,7 @@ main(int argc, char** argv)
 void
 show_usage()
 {
-    std::println(
-        stderr,
+    std::cout <<
         "Chromatin domain simulator\n"
         "usage: main [-osh] <config>\n"
         "\n"
@@ -74,8 +73,7 @@ show_usage()
         "options:\n"
         "  -o <output>  override output HDF5 filename ('output_filename' config key)\n"
         "  -s <seed>    override random seed ('random_seed' config key)\n"
-        "  -h           print this usage message and exit\n"
-    );
+        "  -h           print this usage message and exit\n";
 }
 
 
