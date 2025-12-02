@@ -50,7 +50,8 @@ class Metrics:
     sweep_data: dict
     rg: np.ndarray
     msd_alpha: float
-    pair_msd_alpha: float
+    msd_alpha_a: float
+    msd_alpha_b: float
 
 
 def make_table(results: list[Metrics]) -> pl.DataFrame:
@@ -62,7 +63,8 @@ def make_table(results: list[Metrics]) -> pl.DataFrame:
                 **r.sweep_data,
                 "rg": r.rg,
                 "msd_alpha": r.msd_alpha,
-                "pair_msd_alpha": r.pair_msd_alpha,
+                "msd_alpha_a": r.msd_alpha_a,
+                "msd_alpha_b": r.msd_alpha_b,
             }
         )
 
@@ -81,40 +83,55 @@ def compute_metrics(filename: str, frames: slice) -> Metrics:
     LOG.info("Analyzing file %s", filename)
 
     with h5py.File(filename, "r") as store:
-        _, config = load_config(store)
+        config, config_source = load_config(store)
         phase_store = store["phases/production"]
         snapshots = load_snapshots(phase_store, frames)
 
-    meta = config["@meta"]
+    meta = config_source["@meta"]
     sweep_data = meta["sweep_data"]
     positions_samples = np.array([s.positions for s in snapshots])
-    chain_length = positions_samples.shape[1]
+
+    chain, = config["chains"]
+    chain_length = chain["length"]
+
+    default_valency = config["association"]["valency"]
+    selector_a = np.full(chain_length, False)
+    for feature in chain.get("association_features", []):
+        is_a = False
+        match feature:
+            case {"valency": valency}:
+                is_a = (valency < default_valency)
+
+            case {"association": _} | {"dissociation": _}:
+                assoc = feature.get("association", 1)
+                dissoc = feature.get("dissociation", 1)
+                is_a = (assoc < dissoc)
+
+        if is_a:
+            site = feature["site"]
+            start = site["start"]
+            end = site["end"]
+            selector_a[start:end] = True
+
+    selector_b = ~selector_a
 
     # Rg
-    gyration_radii = compute_rg(positions_samples)
+    rg = compute_rg(positions_samples).mean()
 
     # One-point MSD
     msd_paths = subtract_centroid(positions_samples)
     msd_alpha, _ = compute_msd_params(msd_paths, lag=MSD_LAG)
-
-    # Two-point MSD
-    pair_separation = chain_length // 2
-    pair_msd_deltas = np.swapaxes(
-        [
-            positions_samples[:, i, :] - positions_samples[:, i + pair_separation, :]
-            for i in range(0, chain_length - pair_separation - 1)
-        ],
-        0, 1,
-    )
-    pair_msd_alpha, _ = compute_msd_params(pair_msd_deltas, lag=MSD_LAG)
+    msd_alpha_a, _ = compute_msd_params(msd_paths[:, selector_a], lag=MSD_LAG)
+    msd_alpha_b, _ = compute_msd_params(msd_paths[:, selector_b], lag=MSD_LAG)
 
     return Metrics(
         filename=filename,
         config=config,
         sweep_data=sweep_data,
-        rg=np.mean(gyration_radii),
+        rg=rg,
         msd_alpha=msd_alpha,
-        pair_msd_alpha=pair_msd_alpha,
+        msd_alpha_a=msd_alpha_a,
+        msd_alpha_b=msd_alpha_b,
     )
 
 
