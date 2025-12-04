@@ -72,11 +72,11 @@ loop_extrusion_simulator::get_site_params(std::size_t site, directions dir)
 
 
 void
-loop_extrusion_simulator::step(double dt, random_engine& random)
+loop_extrusion_simulator::step(double dt, structure_data const& structure, random_engine& random)
 {
     step_loading(dt, random);
     step_unloading(dt, random);
-    step_sliding(dt, random);
+    step_sliding(dt, structure, random);
 }
 
 
@@ -125,7 +125,11 @@ loop_extrusion_simulator::step_unloading(double dt, random_engine& random)
 
 
 void
-loop_extrusion_simulator::step_sliding(double dt, random_engine& random)
+loop_extrusion_simulator::step_sliding(
+    double dt,
+    structure_data const& structure,
+    random_engine& random
+)
 {
     auto const compute_affinity_factor = [&](site_params const& depart, site_params const& land) {
         return depart.departure_factor * land.arrival_factor;
@@ -135,7 +139,12 @@ loop_extrusion_simulator::step_sliding(double dt, random_engine& random)
         return small_pow(_config.crossing_factor, site.occupancy);
     };
 
-    auto const attempt_move = [&](std::size_t& stem, std::size_t dest, double rate) {
+    auto const attempt_move = [&](
+        std::size_t peer, std::size_t& stem, std::size_t dest, double rate
+    ) {
+        if (structure.distance(peer, dest) > _config.max_distance) {
+            return;
+        }
         auto const crossing = compute_crossing_factor(_sites[dest]);
         auto const effective_rate = rate * crossing;
         if (poisson_process(effective_rate, dt, random)) {
@@ -153,7 +162,7 @@ loop_extrusion_simulator::step_sliding(double dt, random_engine& random)
             get_site_params(loop.site_1, directions::leftward),
             get_site_params(loop.site_1 - 1, directions::leftward)
         );
-        attempt_move(loop.site_1, loop.site_1 - 1, _config.extrusion_rate * affinity);
+        attempt_move(loop.site_2, loop.site_1, loop.site_1 - 1, _config.extrusion_rate * affinity);
     };
 
     auto const extrude_plus = [&](loop_data& loop) {
@@ -164,7 +173,7 @@ loop_extrusion_simulator::step_sliding(double dt, random_engine& random)
             get_site_params(loop.site_2, directions::rightward),
             get_site_params(loop.site_2 + 1, directions::rightward)
         );
-        attempt_move(loop.site_2, loop.site_2 + 1, _config.extrusion_rate * affinity);
+        attempt_move(loop.site_1, loop.site_2, loop.site_2 + 1, _config.extrusion_rate * affinity);
     };
 
     auto const contract_minus = [&](loop_data& loop) {
@@ -175,7 +184,7 @@ loop_extrusion_simulator::step_sliding(double dt, random_engine& random)
             get_site_params(loop.site_1, directions::leftward),
             get_site_params(loop.site_1 + 1, directions::leftward)
         );
-        attempt_move(loop.site_1, loop.site_1 + 1, _config.contraction_rate * affinity);
+        attempt_move(loop.site_2, loop.site_1, loop.site_1 + 1, _config.contraction_rate * affinity);
     };
 
     auto const contract_plus = [&](loop_data& loop) {
@@ -186,7 +195,7 @@ loop_extrusion_simulator::step_sliding(double dt, random_engine& random)
             get_site_params(loop.site_2, directions::rightward),
             get_site_params(loop.site_2 - 1, directions::rightward)
         );
-        attempt_move(loop.site_2, loop.site_2 - 1, _config.contraction_rate * affinity);
+        attempt_move(loop.site_1, loop.site_2, loop.site_2 - 1, _config.contraction_rate * affinity);
     };
 
     for (auto& loop : _loops) {

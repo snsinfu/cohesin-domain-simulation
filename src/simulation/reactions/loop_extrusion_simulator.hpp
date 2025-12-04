@@ -2,11 +2,13 @@
 
 #include <cstddef>
 #include <iterator>
+#include <limits>
 #include <vector>
 
 #include <md.hpp>
 
 #include "../common_types.hpp"
+#include "../structure_data.hpp"
 #include "../misc/sized_iterator_range.hpp"
 
 
@@ -29,11 +31,12 @@ public:
     struct config_type
     {
         std::size_t site_count;
-        double      loading_rate     = 0;
-        double      unloading_rate   = 0;
-        double      extrusion_rate   = 0;
-        double      contraction_rate = 0;
-        double      crossing_factor  = 0;
+        double      loading_rate      = 0;
+        double      unloading_rate    = 0;
+        double      extrusion_rate    = 0;
+        double      contraction_rate  = 0;
+        double      crossing_factor   = 0;
+        double      max_distance      = std::numeric_limits<double>::infinity();
     };
 
     struct snapshot_type
@@ -64,7 +67,7 @@ public:
     void set_arrival_factor(std::size_t site, directions dir, double factor);
     void set_departure_factor(std::size_t site, directions dir, double factor);
 
-    void step(double dt, random_engine& random);
+    void step(double dt, structure_data const& structure, random_engine& random);
 
     snapshot_type dump_state() const;
     void          load_state(snapshot_type const& state);
@@ -82,7 +85,7 @@ private:
 
     void step_loading(double dt, random_engine& random);
     void step_unloading(double dt, random_engine& random);
-    void step_sliding(double dt, random_engine& random);
+    void step_sliding(double dt, structure_data const& structure, random_engine& random);
 
 private:
     struct site_data

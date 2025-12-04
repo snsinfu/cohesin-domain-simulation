@@ -362,7 +362,7 @@ simulation_driver::run_sampling(phase_config const& phase)
 
         _structure.update(_system.view_positions());
         _associations->step(timestep, _structure, _random);
-        _extruders->step(timestep, _random);
+        _extruders->step(timestep, _structure, _random);
     };
 
     callback(0);
