@@ -110,7 +110,8 @@ JSONCONS_N_MEMBER_TRAITS(
     contraction_rate,
     crossing_factor,
     spring_length,
-    spring_constant
+    spring_constant,
+    max_distance
 )
 
 

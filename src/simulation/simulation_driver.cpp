@@ -101,6 +101,7 @@ simulation_driver::setup_loop_extrusion_simulator()
         .extrusion_rate   = _config.extruder.extrusion_rate,
         .contraction_rate = _config.extruder.contraction_rate,
         .crossing_factor  = _config.extruder.crossing_factor,
+        .max_distance     = _config.extruder.max_distance.value_or(INFINITY),
     });
 
     auto const foreach_site = [](auto const& feature, auto callback) {
