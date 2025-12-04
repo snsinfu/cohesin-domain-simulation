@@ -26,7 +26,9 @@ def main(
     rg = compute_rg(positions_samples).mean()
 
     # One-point MSD
-    msd_paths = subtract_centroid(positions_samples)
+    raw_paths = positions_samples
+    raw_alpha, _ = compute_msd_params(raw_paths, lag=MSD_LAG)
+    msd_paths = subtract_centroid(raw_paths)
     msd_alpha, _ = compute_msd_params(msd_paths, lag=MSD_LAG)
 
     # Two-point MSD
@@ -41,7 +43,7 @@ def main(
     pair_msd_alpha, _ = compute_msd_params(pair_msd_deltas, lag=MSD_LAG)
 
     print(f"Rg: {rg:.4g}")
-    print(f"1p-MSD exp: {msd_alpha:.4g}")
+    print(f"1p-MSD exp: {raw_alpha:.4g} | {msd_alpha:.4g} (decentered)")
     print(f"2p-MSD exp: {pair_msd_alpha:.4g}")
 
 
