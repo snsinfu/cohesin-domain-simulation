@@ -115,6 +115,25 @@ JSONCONS_N_MEMBER_TRAITS(
 )
 
 
+JSONCONS_N_MEMBER_TRAITS(
+    loop_capture_type_config,
+
+    // Required fields
+    0,
+
+    // Optional fields
+    loading_rate,
+    unloading_rate,
+    capture_distance,
+    capture_rate,
+    release_rate,
+    crossing_factor,
+    linear_diffusivity,
+    spring_length,
+    spring_constant
+)
+
+
 // For convenience, we allow site_range to be an interval object {start, end}
 // or a single site index in the config. The latter is interpreted as a single
 // element interval {index, index + 1}.
@@ -192,6 +211,21 @@ JSONCONS_N_MEMBER_TRAITS(
 
 
 JSONCONS_N_MEMBER_TRAITS(
+    loop_capture_feature_config,
+
+    // Required fields
+    1,
+    site,
+
+    // Optional fields
+    loading,
+    unloading,
+    capture,
+    release
+)
+
+
+JSONCONS_N_MEMBER_TRAITS(
     chain_config,
 
     // Required fields
@@ -217,6 +251,7 @@ JSONCONS_N_MEMBER_TRAITS(
     chain,
     association,
     extruder,
+    loop_capture,
     chains
 )
 

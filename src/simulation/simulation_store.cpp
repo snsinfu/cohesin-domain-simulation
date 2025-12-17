@@ -41,6 +41,7 @@ simulation_store::save_snapshot(std::string const& phase_name, snapshot_record c
     do_save_positions(path_base, snapshot);
     do_save_associations(path_base, snapshot);
     do_save_extruders(path_base, snapshot);
+    do_save_captures(path_base, snapshot);
 
     // Update the steps array.
     std::vector<std::string> steps;
@@ -91,4 +92,29 @@ simulation_store::do_save_extruders(std::string const& path_base, snapshot_recor
 
     _store.dataset<h5::i32, 1>(path_extruders_ids).write(ids);
     _store.dataset<h5::i32, 2>(path_extruders_sites).write(sites);
+}
+
+
+void
+simulation_store::do_save_captures(std::string const& path_base, snapshot_record const& snapshot)
+{
+    std::string const path_captures = path_base + "/captures";
+    std::string const path_captures_ids = path_captures + "/ids";
+    std::string const path_captures_sites = path_captures + "/sites";
+
+    std::vector<std::size_t> ids;
+    std::vector<std::array<std::size_t, 2>> sites;
+    for (auto const& cohesin : snapshot.captures.cohesins) {
+        ids.push_back(cohesin.id);
+
+        // Convention: the captured site entry is set equal to the loaded site
+        // when the cohesin is not capturing any site.
+        sites.push_back({
+            cohesin.loaded_site,
+            cohesin.captured_site.value_or(cohesin.loaded_site),
+        });
+    }
+
+    _store.dataset<h5::i32, 1>(path_captures_ids).write(ids);
+    _store.dataset<h5::i32, 2>(path_captures_sites).write(sites);
 }

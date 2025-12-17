@@ -44,10 +44,12 @@ simulation_driver::setup()
     setup_particles();
     setup_association_simulator();
     setup_loop_extrusion_simulator();
+    setup_loop_capture_simulator();
     setup_forcefield_pairwise();
     setup_forcefield_connectivity();
     setup_forcefield_associations();
     setup_forcefield_extruders();
+    setup_forcefield_captures();
     setup_forcefield_container();
 }
 
@@ -145,6 +147,37 @@ simulation_driver::setup_loop_extrusion_simulator()
 
 
 void
+simulation_driver::setup_loop_capture_simulator()
+{
+    loop_capture_simulator captures({
+        .site_count         = _system.particle_count(),
+        .loading_rate       = _config.loop_capture.loading_rate,
+        .unloading_rate     = _config.loop_capture.unloading_rate,
+        .capture_distance   = _config.loop_capture.capture_distance,
+        .capture_rate       = _config.loop_capture.capture_rate,
+        .release_rate       = _config.loop_capture.release_rate,
+        .crossing_factor    = _config.loop_capture.crossing_factor,
+        .linear_diffusivity = _config.loop_capture.linear_diffusivity,
+    });
+
+    for (auto const& chain : _setup.chains) {
+        for (auto const& feature : chain.config.loop_capture_features) {
+            for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
+                std::size_t const site = chain.start + i;
+                if (auto val = feature.loading) { captures.set_loading_factor(site, *val); }
+                if (auto val = feature.unloading) { captures.set_unloading_factor(site, *val); }
+                if (auto val = feature.capture) { captures.set_capture_factor(site, *val); }
+                if (auto val = feature.release) { captures.set_release_factor(site, *val); }
+            }
+        }
+    }
+
+    _captures = std::make_shared<loop_capture_simulator>(captures);
+    _structure.request_neighbor_list(_config.loop_capture.capture_distance);
+}
+
+
+void
 simulation_driver::setup_forcefield_pairwise()
 {
     md::softcore_potential<2, 3> const repulsive_potential {
@@ -238,6 +271,20 @@ simulation_driver::setup_forcefield_extruders()
 
 
 void
+simulation_driver::setup_forcefield_captures()
+{
+    md::spring_potential const potential {
+        .spring_constant      = _config.loop_capture.spring_constant,
+        .equilibrium_distance = _config.loop_capture.spring_length,
+    };
+
+    _system.add_forcefield(
+        activated_interaction_forcefield(_captures, potential, _setup.box)
+    );
+}
+
+
+void
 simulation_driver::setup_forcefield_container()
 {
     _system.add_forcefield(
@@ -257,6 +304,7 @@ simulation_driver::run()
     run_initialization_particles();
     run_initialization_associations();
     run_initialization_extruders();
+    run_initialization_captures();
 
     for (phase_config const& phase : _config.sampling.phases) {
         run_sampling(phase);
@@ -346,6 +394,49 @@ simulation_driver::run_initialization_extruders()
 
 
 void
+simulation_driver::run_initialization_captures()
+{
+    if (!_config.initialization.extruder_preloading) {
+        return;
+    }
+
+    loop_capture_simulator::snapshot_type initial_state;
+    std::size_t next_id = 0;
+
+    for (auto const& chain : _setup.chains) {
+
+        std::vector<double> affinity_mods(chain.end - chain.start, 1);
+        for (auto const& feature : chain.config.loop_capture_features) {
+            for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
+                if (auto val = feature.loading) { affinity_mods[i] *= *val; }
+                if (auto val = feature.unloading) { affinity_mods[i] /= *val; }
+            }
+        }
+
+        for (std::size_t i = 0; i < chain.end - chain.start; i++) {
+            std::size_t const site = chain.start + i;
+
+            double const affinity = affinity_mods[i]
+                * _config.loop_capture.loading_rate
+                / _config.loop_capture.unloading_rate;
+
+            // Limit initial loading up to one for each site.
+            std::poisson_distribution<int> count_distr(affinity);
+            if (std::isinf(affinity) || count_distr(_random) > 0) {
+                initial_state.cohesins.push_back({
+                    .id            = next_id++,
+                    .loaded_site   = site,
+                    .captured_site = std::nullopt,
+                });
+            }
+        }
+    }
+
+    _captures->load_state(initial_state);
+}
+
+
+void
 simulation_driver::run_sampling(phase_config const& phase)
 {
     md::step const steps = phase.steps;
@@ -364,6 +455,7 @@ simulation_driver::run_sampling(phase_config const& phase)
         _structure.update(_system.view_positions());
         _associations->step(timestep, _structure, _random);
         _extruders->step(timestep, _structure, _random);
+        _captures->step(timestep, _structure, _random);
     };
 
     callback(0);
@@ -384,20 +476,15 @@ simulation_driver::show_progress(std::string const& phase_name, md::step step)
     double const energy = _system.compute_energy();
     std::size_t const associations = _associations->active_pairs().size();
     std::size_t const extruders = _extruders->active_pairs().size();
-
-    double average_loop_size = 0;
-    for (auto const& [i, j]: _extruders->active_pairs()){
-        average_loop_size += double(j - i + 1);
-    }
-    average_loop_size /= double(extruders);
+    std::size_t const captures = _captures->active_pairs().size();
 
     std::clog
         << "[" << phase_name << "]"
         << " step: " << std::setw(8) << step
         << " | energy: " << std::setw(6) << std::setprecision(4) << energy
         << " | assocs: " << std::setw(4) << associations
-        << " | loops: " << std::setw(2) << extruders
-        << " (L=" << std::setw(5) <<  average_loop_size << ")"
+        << " | x-loops: " << std::setw(2) << extruders
+        << " | c-loops: " << std::setw(2) << captures
         << std::endl;
 }
 
@@ -410,6 +497,7 @@ simulation_driver::save_sample(std::string const& phase_name, md::step step)
         .positions    = make_vector(_system.view_positions()),
         .associations = _associations->dump_state(),
         .extruders    = _extruders->dump_state(),
+        .captures     = _captures->dump_state(),
     });
 }
 

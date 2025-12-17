@@ -91,6 +91,24 @@ struct extruder_type_config
 };
 
 
+/**
+ * Loop capture parameters. During cohesin is loaded on a chain, the loaded
+ * site is reversiblly associative against other sites on the chain.
+ */
+struct loop_capture_type_config
+{
+    md::scalar loading_rate       = 0;
+    md::scalar unloading_rate     = 1;
+    md::scalar capture_distance   = 1;
+    md::scalar capture_rate       = 0;
+    md::scalar release_rate       = 1;
+    md::scalar crossing_factor    = 1;
+    md::scalar linear_diffusivity = 0;
+    md::scalar spring_length      = 0;
+    md::scalar spring_constant    = 0;
+};
+
+
 /** Half-open interval for specifying a region on a chain. */
 struct site_range
 {
@@ -134,12 +152,27 @@ struct extruder_feature_config
 };
 
 
+/**
+ * Chain feature for overriding loop capture parameters. Models existence of
+ * barriers for cohesin, CTCF, etc. on chromatin.
+ */
+struct loop_capture_feature_config
+{
+    site_range                site;
+    std::optional<md::scalar> loading;
+    std::optional<md::scalar> unloading;
+    std::optional<md::scalar> capture;
+    std::optional<md::scalar> release;
+};
+
+
 /** . */
 struct chain_config
 {
-    md::index                               length;
-    std::vector<association_feature_config> association_features;
-    std::vector<extruder_feature_config>    extruder_features;
+    md::index                                length;
+    std::vector<association_feature_config>  association_features;
+    std::vector<extruder_feature_config>     extruder_features;
+    std::vector<loop_capture_feature_config> loop_capture_features;
 };
 
 
@@ -152,6 +185,7 @@ struct simulation_config
     chain_type_config         chain;
     association_type_config   association;
     extruder_type_config      extruder;
+    loop_capture_type_config  loop_capture;
     std::vector<chain_config> chains;
     std::string               config_text;
 };

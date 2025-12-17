@@ -8,6 +8,7 @@
 
 #include "simulation_config.hpp"
 #include "reactions/association_simulator.hpp"
+#include "reactions/loop_capture_simulator.hpp"
 #include "reactions/loop_extrusion_simulator.hpp"
 
 
@@ -40,6 +41,7 @@ public:
         std::vector<md::point>                  positions;
         association_simulator::snapshot_type    associations;
         loop_extrusion_simulator::snapshot_type extruders;
+        loop_capture_simulator::snapshot_type   captures;
     };
 
     explicit simulation_store(std::string const& filename);
@@ -51,6 +53,7 @@ private:
     void do_save_positions(std::string const& path_base, snapshot_record const& snapshot);
     void do_save_associations(std::string const& path_base, snapshot_record const& snapshot);
     void do_save_extruders(std::string const& path_base, snapshot_record const& snapshot);
+    void do_save_captures(std::string const& path_base, snapshot_record const& snapshot);
 
 private:
     h5::file _store;

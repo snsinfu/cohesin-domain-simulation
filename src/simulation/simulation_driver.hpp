@@ -9,6 +9,7 @@
 #include "simulation_config.hpp"
 #include "simulation_store.hpp"
 #include "reactions/association_simulator.hpp"
+#include "reactions/loop_capture_simulator.hpp"
 #include "reactions/loop_extrusion_simulator.hpp"
 
 
@@ -37,15 +38,18 @@ private:
     void setup_particles();
     void setup_association_simulator();
     void setup_loop_extrusion_simulator();
+    void setup_loop_capture_simulator();
     void setup_forcefield_pairwise();
     void setup_forcefield_connectivity();
     void setup_forcefield_associations();
     void setup_forcefield_extruders();
+    void setup_forcefield_captures();
     void setup_forcefield_container();
 
     void run_initialization_particles();
     void run_initialization_associations();
     void run_initialization_extruders();
+    void run_initialization_captures();
     void run_sampling(phase_config const& phase);
 
     void show_progress(std::string const& phase_name, md::step step);
@@ -61,4 +65,5 @@ private:
     structure_data                            _structure;
     std::shared_ptr<association_simulator>    _associations;
     std::shared_ptr<loop_extrusion_simulator> _extruders;
+    std::shared_ptr<loop_capture_simulator>   _captures;
 };
