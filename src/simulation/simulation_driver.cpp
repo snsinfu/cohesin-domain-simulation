@@ -16,6 +16,7 @@
 simulation_driver::simulation_driver(simulation_config const& config)
 : _config(config)
 , _store(config.sampling.output_filename)
+, _random(config.sampling.random_seed)
 , _structure({})
 {
     setup();
