@@ -352,13 +352,13 @@ loop_capture_simulator::debug_check_invariant() const
 
     std::vector<std::size_t> actual_occupancy(_sites.size());
     for (cohesin_data const& cohesin : _cohesins) {
-        actual_occupancy[cohesin.loaded_site]++;
+        actual_occupancy.at(cohesin.loaded_site)++;
         if (cohesin.captured_site) {
-            actual_occupancy[*cohesin.captured_site]++;
+            actual_occupancy.at(*cohesin.captured_site)++;
         }
     }
     for (std::size_t site = 0; site < _sites.size(); site++) {
-        assert(_sites[site].occupancy == actual_occupancy[site]);
+        assert(_sites.at(site).occupancy == actual_occupancy.at(site));
     }
 #endif
 }

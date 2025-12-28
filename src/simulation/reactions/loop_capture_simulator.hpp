@@ -135,12 +135,14 @@ public:
 
     reference operator*() const
     {
+        assert(_iter->captured_site);
         return { _iter->loaded_site, *_iter->captured_site };
     }
 
     active_iterator& operator++()
     {
         ++_iter;
+        skip_non_loops();
         return *this;
     }
 
