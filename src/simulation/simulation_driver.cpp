@@ -432,6 +432,7 @@ simulation_driver::run_initialization_captures()
             }
         }
     }
+    initial_state.metadata.next_id = next_id;
 
     _captures->load_state(initial_state);
 }
