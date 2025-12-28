@@ -239,6 +239,10 @@ simulation_driver::setup_forcefield_connectivity()
         if (_config.chain.angle_energy > 0) {
             angles->add_bonded_range(chain.start, chain.end);
         }
+
+        for (auto const& loop : chain.config.static_loops) {
+            bonds->add_bonded_pair(loop.pair.site_1, loop.pair.site_2);
+        }
     }
 }
 

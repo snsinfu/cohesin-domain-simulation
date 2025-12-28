@@ -170,6 +170,35 @@ struct jsoncons::json_type_traits<Json, site_range>
 };
 
 
+// site_pair is serialized as a length-two array.
+template<class Json>
+struct jsoncons::json_type_traits<Json, site_pair>
+{
+    using allocator_type = typename Json::allocator_type;
+
+    static bool is(const Json& j) noexcept
+    {
+        return j.is_array() && j.size() == 2;
+    }
+
+    static site_pair as(const Json& j)
+    {
+        return {
+            .site_1 = j[0].template as<md::index>(),
+            .site_2 = j[1].template as<md::index>(),
+        };
+    }
+
+    static Json to_json(site_pair const& value, allocator_type alloc = {})
+    {
+        Json j(jsoncons::json_array_arg_t(), jsoncons::semantic_tag::none, alloc);
+        j.push_back(value.site_1);
+        j.push_back(value.site_2);
+        return j;
+    }
+};
+
+
 JSONCONS_N_MEMBER_TRAITS(
     association_feature_config,
 
@@ -226,6 +255,15 @@ JSONCONS_N_MEMBER_TRAITS(
 
 
 JSONCONS_N_MEMBER_TRAITS(
+    static_loop_config,
+
+    // Required fields
+    1,
+    pair
+)
+
+
+JSONCONS_N_MEMBER_TRAITS(
     chain_config,
 
     // Required fields
@@ -234,7 +272,9 @@ JSONCONS_N_MEMBER_TRAITS(
 
     // Optional fields
     association_features,
-    extruder_features
+    extruder_features,
+    loop_capture_features,
+    static_loops
 )
 
 

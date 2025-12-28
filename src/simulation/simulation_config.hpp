@@ -120,6 +120,14 @@ inline counting_iterator<md::index> begin(site_range const& r) { return counting
 inline counting_iterator<md::index> end(site_range const& r) { return counting_iterator(r.end); }
 
 
+/** Index pair designating paired sites. */
+struct site_pair
+{
+    md::index site_1 = 0;
+    md::index site_2 = 0;
+};
+
+
 /** Chain feature for overriding association parameters. */
 struct association_feature_config
 {
@@ -166,6 +174,15 @@ struct loop_capture_feature_config
 };
 
 
+/**
+ * Chain feature for defining additional bonds (static loops) on a chain.
+ */
+struct static_loop_config
+{
+    site_pair pair;
+};
+
+
 /** . */
 struct chain_config
 {
@@ -173,6 +190,7 @@ struct chain_config
     std::vector<association_feature_config>  association_features;
     std::vector<extruder_feature_config>     extruder_features;
     std::vector<loop_capture_feature_config> loop_capture_features;
+    std::vector<static_loop_config>          static_loops;
 };
 
 
