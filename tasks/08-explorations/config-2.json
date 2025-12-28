@@ -1,0 +1,60 @@
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              5,
+        "association_distance": 1.5,
+        "association_rate":     20,
+        "dissociation_rate":    2,
+        "association_energy":   5
+    },
+
+    "loop_capture": {
+        "loading_rate":       0.5e-5,
+        "unloading_rate":     1e-3,
+        "capture_distance":   1.5,
+        "capture_rate":       0.1,
+        "release_rate":       5,
+        "crossing_factor":    1,
+        "linear_diffusivity": 1,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": [
+        {
+            "length": 200,
+
+            "association_features": [
+                {"site": 25, "valency": 1}, {"site": {"start": 35, "end": 37}, "valency": 1}, {"site": 40, "valency": 1}, {"site": 52, "valency": 1}, {"site": {"start": 56, "end": 65}, "valency": 1}, {"site": {"start": 75, "end": 83}, "valency": 1}, {"site": {"start": 97, "end": 99}, "valency": 1}, {"site": 104, "valency": 1}, {"site": 109, "valency": 1}, {"site": {"start": 112, "end": 117}, "valency": 1}, {"site": 124, "valency": 1}, {"site": 128, "valency": 1}, {"site": 132, "valency": 1}, {"site": 134, "valency": 1}, {"site": 141, "valency": 1}, {"site": {"start": 152, "end": 155}, "valency": 1}, {"site": {"start": 169, "end": 171}, "valency": 1}, {"site": 172, "valency": 1}, {"site": 186, "valency": 1}, {"site": 199, "valency": 1}
+            ],
+
+            "loop_capture_features": [
+                {"site": 25, "loading": 50, "capture": 50}, {"site": {"start": 35, "end": 37}, "loading": 50, "capture": 50}, {"site": 40, "loading": 50, "capture": 50}, {"site": 52, "loading": 50, "capture": 50}, {"site": {"start": 56, "end": 65}, "loading": 50, "capture": 50}, {"site": {"start": 75, "end": 83}, "loading": 50, "capture": 50}, {"site": {"start": 97, "end": 99}, "loading": 50, "capture": 50}, {"site": 104, "loading": 50, "capture": 50}, {"site": 109, "loading": 50, "capture": 50}, {"site": {"start": 112, "end": 117}, "loading": 50, "capture": 50}, {"site": 124, "loading": 50, "capture": 50}, {"site": 128, "loading": 50, "capture": 50}, {"site": 132, "loading": 50, "capture": 50}, {"site": 134, "loading": 50, "capture": 50}, {"site": 141, "loading": 50, "capture": 50}, {"site": {"start": 152, "end": 155}, "loading": 50, "capture": 50}, {"site": {"start": 169, "end": 171}, "loading": 50, "capture": 50}, {"site": 172, "loading": 50, "capture": 50}, {"site": 186, "loading": 50, "capture": 50}, {"site": 199, "loading": 50, "capture": 50}
+            ]
+        }
+    ]
+}

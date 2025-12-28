@@ -1,0 +1,44 @@
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 3000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              5,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     10,
+        "dissociation_rate":    1
+    },
+
+    "chains": [
+        {
+            "length": 200,
+
+            "association_features": [
+                {"site": {"start": 11, "end": 16}, "valency": 1}, {"site": {"start": 19, "end": 22}, "valency": 1}, {"site": 25, "valency": 1}, {"site": {"start": 27, "end": 31}, "valency": 1}, {"site": {"start": 32, "end": 34}, "valency": 1}, {"site": 42, "valency": 1}, {"site": {"start": 45, "end": 47}, "valency": 1}, {"site": 52, "valency": 1}, {"site": {"start": 56, "end": 59}, "valency": 1}, {"site": 61, "valency": 1}, {"site": 64, "valency": 1}, {"site": 74, "valency": 1}, {"site": {"start": 80, "end": 82}, "valency": 1}, {"site": {"start": 86, "end": 88}, "valency": 1}, {"site": 92, "valency": 1}, {"site": 102, "valency": 1}, {"site": 108, "valency": 1}, {"site": {"start": 112, "end": 117}, "valency": 1}, {"site": {"start": 120, "end": 123}, "valency": 1}, {"site": 124, "valency": 1}, {"site": 131, "valency": 1}, {"site": 134, "valency": 1}, {"site": {"start": 140, "end": 143}, "valency": 1}, {"site": 144, "valency": 1}, {"site": 148, "valency": 1}, {"site": {"start": 153, "end": 155}, "valency": 1}, {"site": 175, "valency": 1}, {"site": {"start": 177, "end": 179}, "valency": 1}, {"site": 186, "valency": 1}, {"site": 192, "valency": 1}, {"site": {"start": 197, "end": 200}, "valency": 1}
+            ]
+        }
+    ]
+}

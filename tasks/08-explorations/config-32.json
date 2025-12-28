@@ -1,0 +1,72 @@
+
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 3000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance": 1,
+        "repulsive_energy":   20,
+        "spring_length":      1,
+        "spring_constant":    200,
+        "monomer_mobility":   3.0
+    },
+
+    "association": {
+        "valency":              3,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     3,
+        "dissociation_rate":    0.1
+    },
+
+    "loop_capture": {
+        "loading_rate":       1e-5,
+        "unloading_rate":     1e-3,
+        "capture_distance":   1.5,
+        "capture_rate":       1e-2,
+        "release_rate":       1,
+        "crossing_factor":    1,
+        "linear_diffusivity": 3,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": [
+        {
+            "length": 200,
+
+            "association_features": [
+                {"site": {"start":  10, "end":  20}, "valency": 1},
+                {"site": {"start":  70, "end":  80}, "valency": 1},
+                {"site": {"start": 121, "end": 131}, "valency": 1},
+                {"site": {"start": 181, "end": 190}, "valency": 1}
+            ],
+
+            "loop_capture_features": [
+                {"site": {"start":  10, "end":  20}, "loading": 10},
+                {"site": {"start":  70, "end":  80}, "loading": 10},
+                {"site": {"start": 121, "end": 131}, "loading": 10},
+                {"site": {"start": 181, "end": 190}, "loading": 10},
+
+                {"site":  10, "capture": 1e3},
+                {"site":  70, "capture": 1e3},
+                {"site": 130, "capture": 1e3},
+                {"site": 190, "capture": 1e3}
+            ]
+        }
+    ]
+}

@@ -1,0 +1,58 @@
+{
+    "@meta": {
+        "notes": [
+            "explore loop capture",
+            "no loop capture, cf config-20"
+        ]
+    },
+
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ]
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              5,
+        "association_distance": 1.5,
+        "association_rate":     10,
+        "dissociation_rate":    0.1,
+        "association_energy":   5
+    },
+
+    "loop_capture": {
+        "loading_rate":       0,
+        "unloading_rate":     1e-3,
+        "capture_distance":   1.5,
+        "capture_rate":       1.0,
+        "release_rate":       0.5,
+        "crossing_factor":    1.0,
+        "linear_diffusivity": 1.0,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": [
+        {
+            "length": 200,
+            "association_features": [{"site": {"start": 23, "end": 28}, "valency": 1}, {"site": {"start": 31, "end": 32}, "valency": 1}, {"site": {"start": 34, "end": 35}, "valency": 1}, {"site": {"start": 41, "end": 42}, "valency": 1}, {"site": {"start": 43, "end": 46}, "valency": 1}, {"site": {"start": 48, "end": 50}, "valency": 1}, {"site": {"start": 62, "end": 65}, "valency": 1}, {"site": {"start": 68, "end": 70}, "valency": 1}, {"site": {"start": 74, "end": 75}, "valency": 1}, {"site": {"start": 77, "end": 78}, "valency": 1}, {"site": {"start": 88, "end": 90}, "valency": 1}, {"site": {"start": 102, "end": 104}, "valency": 1}, {"site": {"start": 106, "end": 107}, "valency": 1}, {"site": {"start": 110, "end": 111}, "valency": 1}, {"site": {"start": 112, "end": 114}, "valency": 1}, {"site": {"start": 118, "end": 123}, "valency": 1}, {"site": {"start": 125, "end": 127}, "valency": 1}, {"site": {"start": 134, "end": 135}, "valency": 1}, {"site": {"start": 136, "end": 138}, "valency": 1}, {"site": {"start": 146, "end": 147}, "valency": 1}, {"site": {"start": 166, "end": 167}, "valency": 1}, {"site": {"start": 168, "end": 172}, "valency": 1}, {"site": {"start": 174, "end": 175}, "valency": 1}, {"site": {"start": 177, "end": 178}, "valency": 1}, {"site": {"start": 183, "end": 184}, "valency": 1}, {"site": {"start": 189, "end": 191}, "valency": 1}, {"site": {"start": 193, "end": 194}, "valency": 1}, {"site": {"start": 197, "end": 198}, "valency": 1}]
+        }
+    ]
+}

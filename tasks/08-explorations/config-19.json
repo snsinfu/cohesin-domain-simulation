@@ -1,0 +1,68 @@
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 3000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              5,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     10,
+        "dissociation_rate":    0.1
+    },
+
+    "loop_capture": {
+        "loading_rate":       10e-5,
+        "unloading_rate":     1e-3,
+        "capture_distance":   1.5,
+        "capture_rate":       10,
+        "release_rate":       10,
+        "crossing_factor":    1,
+        "linear_diffusivity": 3,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": [
+        {
+            "length": 200,
+
+            "association_features": [
+                {"site": {"start":  17, "end":  24}, "valency": 1},
+                {"site": {"start":  57, "end":  64}, "valency": 1},
+                {"site": {"start":  97, "end": 104}, "valency": 1},
+                {"site": {"start": 137, "end": 144}, "valency": 1},
+                {"site": {"start": 177, "end": 184}, "valency": 1}
+            ],
+
+            "loop_capture_features": [
+                {"site":  20, "capture": 100},
+                {"site":  60, "capture": 100},
+                {"site": 100, "capture": 100},
+                {"site": 140, "capture": 100},
+                {"site": 180, "capture": 100}
+            ]
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "@meta": {
+        "sweep_ranges": {
+            "association_valency:int":      [3, 5],
+            "association_energy:real":      [2, 8],
+            "association_constant:logreal": [1, 100],
+            "dissociation_rate:logreal":    [0.1, 10]
+        },
+        "extra_params": {
+        },
+        "sweep_seed":  0,
+        "sweep_count": 300
+    },
+
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 3000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              null,
+        "association_distance": 1.5,
+        "association_energy":   null,
+        "association_rate":     null,
+        "dissociation_rate":    null
+    },
+
+    "chains": [
+        {"length": 200}
+    ]
+}

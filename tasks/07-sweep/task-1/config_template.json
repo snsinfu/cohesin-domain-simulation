@@ -1,0 +1,68 @@
+{
+    "@meta": {
+        "sweep_ranges": {
+            "chain_length:logint":                [30, 300],
+            "acetylation_level:logreal":          [1e-3, 1e0],
+            "acetylation_capture_factor:logreal": [1e0, 1e2],
+            "loading_constant:logreal":           [1e-4, 1e-1],
+            "unloading_rate:logreal":             [1e-4, 1e-2],
+            "capture_constant:logreal":           [1e-1, 1e1],
+            "release_rate:logreal":               [1e-3, 1e0],
+            "crossing_factor:logreal":            [1e-2, 1e0],
+            "linear_diffusivity:logreal":         [1e-2, 1e1]
+        },
+        "extra_params": {
+            "acetylation_size":    2,
+            "acetylation_valency": 1
+        },
+        "sweep_seed":  0,
+        "sweep_count": 500
+    },
+
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance":  1,
+        "repulsive_energy":    20,
+        "spring_length":       1,
+        "spring_constant":     200,
+        "monomer_mobility":    3.0
+    },
+
+    "association": {
+        "valency":              5,
+        "association_distance": 1.5,
+        "association_rate":     10,
+        "dissociation_rate":    0.1,
+        "association_energy":   3
+    },
+
+    "loop_capture": {
+        "loading_rate":       null,
+        "unloading_rate":     null,
+        "capture_distance":   1.5,
+        "capture_rate":       null,
+        "release_rate":       null,
+        "crossing_factor":    null,
+        "linear_diffusivity": null,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": null
+}

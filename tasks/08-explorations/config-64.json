@@ -1,0 +1,51 @@
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance": 1,
+        "repulsive_energy":   20,
+        "spring_length":      1,
+        "spring_constant":    200,
+        "monomer_mobility":   3.0
+    },
+
+    "association": {
+        "valency":              3,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     1,
+        "dissociation_rate":    0.1
+    },
+
+    "chains": [
+        {
+            "length": 400,
+
+            "association_features": [
+                {"site": {"start": 15, "end": 17}, "dissociation": 100}, {"site": {"start": 49, "end": 53}, "dissociation": 100}, {"site": 55, "dissociation": 100}, {"site": 65, "dissociation": 100}, {"site": {"start": 76, "end": 79}, "dissociation": 100}, {"site": 88, "dissociation": 100}, {"site": {"start": 120, "end": 122}, "dissociation": 100}, {"site": 124, "dissociation": 100}, {"site": 152, "dissociation": 100}, {"site": 167, "dissociation": 100}, {"site": 173, "dissociation": 100}, {"site": {"start": 183, "end": 186}, "dissociation": 100}, {"site": 199, "dissociation": 100}, {"site": 209, "dissociation": 100}, {"site": {"start": 230, "end": 233}, "dissociation": 100}, {"site": {"start": 250, "end": 254}, "dissociation": 100}, {"site": 267, "dissociation": 100}, {"site": 333, "dissociation": 100}, {"site": {"start": 336, "end": 339}, "dissociation": 100}, {"site": 350, "dissociation": 100}, {"site": 360, "dissociation": 100}, {"site": 372, "dissociation": 100}, {"site": {"start": 398, "end": 400}, "dissociation": 100},
+
+                {"site": {"start": 197, "end": 204}, "valency": 0}
+            ],
+
+            "static_loops": [
+                {"pair": [15, 185]},
+                {"pair": [209, 399]}
+            ]
+        }
+    ]
+}

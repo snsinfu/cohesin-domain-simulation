@@ -1,0 +1,67 @@
+
+
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 3000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance": 1,
+        "repulsive_energy":   20,
+        "spring_length":      1,
+        "spring_constant":    200,
+        "monomer_mobility":   3.0
+    },
+
+    "association": {
+        "valency":              3,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     3,
+        "dissociation_rate":    0.1
+    },
+
+    "loop_capture": {
+        "loading_rate":       0,
+        "unloading_rate":     1e-3,
+        "capture_distance":   1.5,
+        "capture_rate":       1e-2,
+        "release_rate":       1,
+        "crossing_factor":    1,
+        "linear_diffusivity": 3,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": [
+        {
+            "length": 200,
+
+            "association_features": [
+                {"site": {"start": 9, "end": 11}, "valency": 1}, {"site": 12, "valency": 1}, {"site": {"start": 15, "end": 17}, "valency": 1}, {"site": 22, "valency": 1}, {"site": 33, "valency": 1}, {"site": 37, "valency": 1}, {"site": 39, "valency": 1}, {"site": 45, "valency": 1}, {"site": {"start": 58, "end": 62}, "valency": 1}, {"site": 67, "valency": 1}, {"site": 70, "valency": 1}, {"site": {"start": 72, "end": 75}, "valency": 1}, {"site": {"start": 78, "end": 80}, "valency": 1}, {"site": {"start": 82, "end": 84}, "valency": 1}, {"site": {"start": 87, "end": 89}, "valency": 1}, {"site": {"start": 90, "end": 92}, "valency": 1}, {"site": {"start": 93, "end": 95}, "valency": 1}, {"site": 96, "valency": 1}, {"site": 99, "valency": 1}, {"site": {"start": 108, "end": 111}, "valency": 1}, {"site": {"start": 113, "end": 115}, "valency": 1}, {"site": 116, "valency": 1}, {"site": {"start": 130, "end": 132}, "valency": 1}, {"site": {"start": 141, "end": 144}, "valency": 1}, {"site": {"start": 150, "end": 152}, "valency": 1}, {"site": 153, "valency": 1}, {"site": {"start": 157, "end": 159}, "valency": 1}, {"site": 171, "valency": 1}, {"site": 178, "valency": 1}, {"site": {"start": 182, "end": 184}, "valency": 1}, {"site": 191, "valency": 1}, {"site": 195, "valency": 1}, {"site": 198, "valency": 1}
+            ],
+
+            "loop_capture_features": [
+                {"site": {"start": 9, "end": 11}, "loading": 10}, {"site": 12, "loading": 10}, {"site": {"start": 15, "end": 17}, "loading": 10}, {"site": 22, "loading": 10}, {"site": 33, "loading": 10}, {"site": 37, "loading": 10}, {"site": 39, "loading": 10}, {"site": 45, "loading": 10}, {"site": {"start": 58, "end": 62}, "loading": 10}, {"site": 67, "loading": 10}, {"site": 70, "loading": 10}, {"site": {"start": 72, "end": 75}, "loading": 10}, {"site": {"start": 78, "end": 80}, "loading": 10}, {"site": {"start": 82, "end": 84}, "loading": 10}, {"site": {"start": 87, "end": 89}, "loading": 10}, {"site": {"start": 90, "end": 92}, "loading": 10}, {"site": {"start": 93, "end": 95}, "loading": 10}, {"site": 96, "loading": 10}, {"site": 99, "loading": 10}, {"site": {"start": 108, "end": 111}, "loading": 10}, {"site": {"start": 113, "end": 115}, "loading": 10}, {"site": 116, "loading": 10}, {"site": {"start": 130, "end": 132}, "loading": 10}, {"site": {"start": 141, "end": 144}, "loading": 10}, {"site": {"start": 150, "end": 152}, "loading": 10}, {"site": 153, "loading": 10}, {"site": {"start": 157, "end": 159}, "loading": 10}, {"site": 171, "loading": 10}, {"site": 178, "loading": 10}, {"site": {"start": 182, "end": 184}, "loading": 10}, {"site": 191, "loading": 10}, {"site": 195, "loading": 10}, {"site": 198, "loading": 10},
+
+                {"site":  10, "capture": 1e3},
+                {"site":  70, "capture": 1e3},
+                {"site": 130, "capture": 1e3},
+                {"site": 183, "capture": 1e3}
+            ]
+        }
+    ]
+}

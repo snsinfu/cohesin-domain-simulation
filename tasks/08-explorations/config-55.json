@@ -1,0 +1,72 @@
+{
+    "sampling": {
+        "timestep":         5e-4,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 5000000, "sampling_interval": 10000},
+            {"name": "production", "steps": 1000000, "sampling_interval":   100}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance": 1,
+        "repulsive_energy":   20,
+        "spring_length":      1,
+        "spring_constant":    200,
+        "monomer_mobility":   3.0
+    },
+
+    "association": {
+        "valency":              3,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     1,
+        "dissociation_rate":    0.1
+    },
+
+    "loop_capture": {
+        "loading_rate":       0,
+        "unloading_rate":     1e-2,
+        "capture_distance":   1.5,
+        "capture_rate":       10,
+        "release_rate":       10,
+        "crossing_factor":    0,
+        "linear_diffusivity": 3,
+        "spring_length":      1,
+        "spring_constant":    200
+    },
+
+    "chains": [
+        {
+            "length": 400,
+
+            "association_features": [
+                {"site": 2, "dissociation": 100}, {"site": {"start": 6, "end": 9}, "dissociation": 100}, {"site": {"start": 12, "end": 14}, "dissociation": 100}, {"site": 17, "dissociation": 100}, {"site": {"start": 24, "end": 26}, "dissociation": 100}, {"site": 29, "dissociation": 100}, {"site": 31, "dissociation": 100}, {"site": {"start": 35, "end": 37}, "dissociation": 100}, {"site": {"start": 46, "end": 50}, "dissociation": 100}, {"site": {"start": 59, "end": 61}, "dissociation": 100}, {"site": 65, "dissociation": 100}, {"site": {"start": 74, "end": 79}, "dissociation": 100}, {"site": 81, "dissociation": 100}, {"site": {"start": 87, "end": 90}, "dissociation": 100}, {"site": {"start": 93, "end": 97}, "dissociation": 100}, {"site": 98, "dissociation": 100}, {"site": 100, "dissociation": 100}, {"site": {"start": 102, "end": 105}, "dissociation": 100}, {"site": 107, "dissociation": 100}, {"site": 111, "dissociation": 100}, {"site": {"start": 114, "end": 117}, "dissociation": 100}, {"site": 118, "dissociation": 100}, {"site": {"start": 121, "end": 123}, "dissociation": 100}, {"site": {"start": 129, "end": 131}, "dissociation": 100}, {"site": {"start": 133, "end": 137}, "dissociation": 100}, {"site": 142, "dissociation": 100}, {"site": 144, "dissociation": 100}, {"site": 146, "dissociation": 100}, {"site": 150, "dissociation": 100}, {"site": 153, "dissociation": 100}, {"site": 157, "dissociation": 100}, {"site": 162, "dissociation": 100}, {"site": 178, "dissociation": 100}, {"site": 182, "dissociation": 100}, {"site": 186, "dissociation": 100}, {"site": {"start": 191, "end": 193}, "dissociation": 100}, {"site": {"start": 200, "end": 202}, "dissociation": 100}, {"site": 207, "dissociation": 100}, {"site": {"start": 213, "end": 215}, "dissociation": 100}, {"site": 220, "dissociation": 100}, {"site": {"start": 235, "end": 237}, "dissociation": 100}, {"site": {"start": 239, "end": 241}, "dissociation": 100}, {"site": 248, "dissociation": 100}, {"site": {"start": 251, "end": 253}, "dissociation": 100}, {"site": {"start": 256, "end": 258}, "dissociation": 100}, {"site": 263, "dissociation": 100}, {"site": 273, "dissociation": 100}, {"site": 276, "dissociation": 100}, {"site": {"start": 283, "end": 285}, "dissociation": 100}, {"site": {"start": 291, "end": 294}, "dissociation": 100}, {"site": 297, "dissociation": 100}, {"site": {"start": 299, "end": 301}, "dissociation": 100}, {"site": 321, "dissociation": 100}, {"site": {"start": 323, "end": 325}, "dissociation": 100}, {"site": {"start": 333, "end": 336}, "dissociation": 100}, {"site": 339, "dissociation": 100}, {"site": {"start": 342, "end": 344}, "dissociation": 100}, {"site": {"start": 345, "end": 348}, "dissociation": 100}, {"site": {"start": 353, "end": 355}, "dissociation": 100}, {"site": {"start": 358, "end": 361}, "dissociation": 100}, {"site": 362, "dissociation": 100}, {"site": {"start": 364, "end": 366}, "dissociation": 100}, {"site": 369, "dissociation": 100}, {"site": 373, "dissociation": 100}, {"site": {"start": 376, "end": 379}, "dissociation": 100}, {"site": 384, "dissociation": 100}, {"site": {"start": 391, "end": 393}, "dissociation": 100}
+            ],
+
+            "loop_capture_features": [
+                {"site": 2, "loading": 10}, {"site": {"start": 6, "end": 9}, "loading": 10}, {"site": {"start": 12, "end": 14}, "loading": 10}, {"site": 17, "loading": 10}, {"site": {"start": 24, "end": 26}, "loading": 10}, {"site": 29, "loading": 10}, {"site": 31, "loading": 10}, {"site": {"start": 35, "end": 37}, "loading": 10}, {"site": {"start": 46, "end": 50}, "loading": 10}, {"site": {"start": 59, "end": 61}, "loading": 10}, {"site": 65, "loading": 10}, {"site": {"start": 74, "end": 79}, "loading": 10}, {"site": 81, "loading": 10}, {"site": {"start": 87, "end": 90}, "loading": 10}, {"site": {"start": 93, "end": 97}, "loading": 10}, {"site": 98, "loading": 10}, {"site": 100, "loading": 10}, {"site": {"start": 102, "end": 105}, "loading": 10}, {"site": 107, "loading": 10}, {"site": 111, "loading": 10}, {"site": {"start": 114, "end": 117}, "loading": 10}, {"site": 118, "loading": 10}, {"site": {"start": 121, "end": 123}, "loading": 10}, {"site": {"start": 129, "end": 131}, "loading": 10}, {"site": {"start": 133, "end": 137}, "loading": 10}, {"site": 142, "loading": 10}, {"site": 144, "loading": 10}, {"site": 146, "loading": 10}, {"site": 150, "loading": 10}, {"site": 153, "loading": 10}, {"site": 157, "loading": 10}, {"site": 162, "loading": 10}, {"site": 178, "loading": 10}, {"site": 182, "loading": 10}, {"site": 186, "loading": 10}, {"site": {"start": 191, "end": 193}, "loading": 10}, {"site": {"start": 200, "end": 202}, "loading": 10}, {"site": 207, "loading": 10}, {"site": {"start": 213, "end": 215}, "loading": 10}, {"site": 220, "loading": 10}, {"site": {"start": 235, "end": 237}, "loading": 10}, {"site": {"start": 239, "end": 241}, "loading": 10}, {"site": 248, "loading": 10}, {"site": {"start": 251, "end": 253}, "loading": 10}, {"site": {"start": 256, "end": 258}, "loading": 10}, {"site": 263, "loading": 10}, {"site": 273, "loading": 10}, {"site": 276, "loading": 10}, {"site": {"start": 283, "end": 285}, "loading": 10}, {"site": {"start": 291, "end": 294}, "loading": 10}, {"site": 297, "loading": 10}, {"site": {"start": 299, "end": 301}, "loading": 10}, {"site": 321, "loading": 10}, {"site": {"start": 323, "end": 325}, "loading": 10}, {"site": {"start": 333, "end": 336}, "loading": 10}, {"site": 339, "loading": 10}, {"site": {"start": 342, "end": 344}, "loading": 10}, {"site": {"start": 345, "end": 348}, "loading": 10}, {"site": {"start": 353, "end": 355}, "loading": 10}, {"site": {"start": 358, "end": 361}, "loading": 10}, {"site": 362, "loading": 10}, {"site": {"start": 364, "end": 366}, "loading": 10}, {"site": 369, "loading": 10}, {"site": 373, "loading": 10}, {"site": {"start": 376, "end": 379}, "loading": 10}, {"site": 384, "loading": 10}, {"site": {"start": 391, "end": 393}, "loading": 10},
+
+                {"site":   6, "release": 1e-3},
+                {"site":  59, "release": 1e-3},
+                {"site":  93, "release": 1e-3},
+                {"site": 133, "release": 1e-3},
+                {"site": 191, "release": 1e-3},
+
+                {"site": 239, "release": 1e-3},
+                {"site": 251, "release": 1e-3},
+                {"site": 283, "release": 1e-3},
+                {"site": 333, "release": 1e-3},
+                {"site": 391, "release": 1e-3}
+            ]
+        }
+    ]
+}
