@@ -274,7 +274,8 @@ JSONCONS_N_MEMBER_TRAITS(
     association_features,
     extruder_features,
     loop_capture_features,
-    static_loops
+    static_loops,
+    attributes
 )
 
 

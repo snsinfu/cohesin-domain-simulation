@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
@@ -186,11 +187,12 @@ struct static_loop_config
 /** . */
 struct chain_config
 {
-    md::index                                length;
-    std::vector<association_feature_config>  association_features;
-    std::vector<extruder_feature_config>     extruder_features;
-    std::vector<loop_capture_feature_config> loop_capture_features;
-    std::vector<static_loop_config>          static_loops;
+    md::index                                      length;
+    std::vector<association_feature_config>        association_features;
+    std::vector<extruder_feature_config>           extruder_features;
+    std::vector<loop_capture_feature_config>       loop_capture_features;
+    std::vector<static_loop_config>                static_loops;
+    std::map<std::string, std::vector<md::scalar>> attributes;
 };
 
 
