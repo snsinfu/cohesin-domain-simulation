@@ -46,7 +46,7 @@ struct environment_config
 /** Initialization */
 struct initialization_config
 {
-    bool       extruder_preloading   = false;
+    bool       preload_cohesin       = false;
     md::index  initial_step_monomers = 1;
     md::scalar initial_step_scale    = 1;
 };

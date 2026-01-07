@@ -363,7 +363,7 @@ simulation_driver::run_initialization_associations()
 void
 simulation_driver::run_initialization_extruders()
 {
-    if (!_config.initialization.extruder_preloading) {
+    if (!_config.initialization.preload_cohesin) {
         return;
     }
 
@@ -402,7 +402,7 @@ simulation_driver::run_initialization_extruders()
 void
 simulation_driver::run_initialization_captures()
 {
-    if (!_config.initialization.extruder_preloading) {
+    if (!_config.initialization.preload_cohesin) {
         return;
     }
 

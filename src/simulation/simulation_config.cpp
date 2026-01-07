@@ -57,7 +57,7 @@ JSONCONS_N_MEMBER_TRAITS(
     0,
 
     // Optional fields
-    extruder_preloading,
+    preload_cohesin,
     initial_step_monomers,
     initial_step_scale
 )
