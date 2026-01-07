@@ -38,6 +38,7 @@ class ParticlesData:
     type_ids: list[int]
     type_names: list[str]
     positions: np.ndarray
+    attributes: dict[str, np.ndarray]
 
 
 @dataclass
@@ -59,12 +60,26 @@ def combine_types(*sources: list[any]) -> tuple[list[int], list[str]]:
     return type_ids, type_names
 
 
+def combine_attributes(*sources: list[any]) -> dict[str, np.ndarray]:
+    keys = set()
+    for source in sources:
+        keys.update(source.attributes.keys())
+
+    def maybe_attribute(source: any, key: str, null_value: any = None) -> np.ndarray:
+        if key not in source.attributes:
+            return np.full(len(source.type_ids), np.nan)
+        return source.attributes[key]
+
+    return {key: np.concatenate([maybe_attribute(source, key) for source in sources]) for key in keys}
+
+
 def combine_particles_data(*sources: list[ParticlesData]) -> ParticlesData:
     type_ids, type_names = combine_types(*sources)
     return ParticlesData(
         type_ids=type_ids,
         type_names=type_names,
-        positions=np.concat([source.positions for source in sources]),
+        positions=np.concatenate([source.positions for source in sources]),
+        attributes=combine_attributes(*sources),
     )
 
 
@@ -90,6 +105,7 @@ class TopologyMod:
             type_ids=[],
             type_names=[],
             positions=np.zeros((0, DIMENSION)),
+            attributes={},
         )
 
     def derive_bonds(
@@ -135,10 +151,21 @@ class ChromatinMod(TopologyMod):
         snapshot: h5py.Group,
     ) -> ParticlesData:
         positions = snapshot["positions"][:]
+
+        # Load particle attributes if any.
+        attributes: dict[str, np.ndarray] = {}
+        for group in (metadata, snapshot):
+            if "particle_attributes" not in group:
+                continue
+            attributes_store = group["particle_attributes"]
+            for key in attributes_store.keys():
+                attributes[key] = attributes_store[key][:]
+
         return ParticlesData(
             type_ids=([0] * len(positions)),
             type_names=[self.PARTICLE_TYPE],
             positions=positions,
+            attributes=attributes,
         )
 
     def derive_bonds(
@@ -178,6 +205,7 @@ class CohesinMod(TopologyMod):
             type_ids=([0] * len(cohesin_positions)),
             type_names=[self.PARTICLE_TYPE],
             positions=cohesin_positions,
+            attributes={},
         )
 
     def derive_bonds(
@@ -213,7 +241,7 @@ def dump_trajectory(
             particle_types=particles.type_ids,
             particle_type_names=particles.type_names,
             particle_positions=particles.positions,
-            particle_attributes={},
+            particle_attributes=particles.attributes,
             bond_types=bonds.type_ids,
             bond_type_names=bonds.type_names,
             bond_pairs=bonds.pairs,
