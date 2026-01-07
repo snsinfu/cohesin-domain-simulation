@@ -6,11 +6,17 @@ _*
 .pixi/*
 !.pixi/config.toml
 
+# C++ program
 *.o
-*.h5
-*.gsd
+core.*
 /src/simulation/main
 
+# Produced data
+*.h5
+*.gsd
+*.csv
+
+# Other data
 *.gz
 *.mcool
 *.bb

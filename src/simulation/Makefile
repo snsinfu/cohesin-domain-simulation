@@ -56,4 +56,4 @@ $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 -include _depends.mk
--include _overrides.mk
+-include overrides.mk
