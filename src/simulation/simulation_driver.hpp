@@ -56,6 +56,8 @@ private:
     void save_sample(std::string const& phase_name, md::step step);
     void save_metadata();
 
+    void check_sanity() const;
+
 private:
     simulation_config                         _config;
     simulation_setup                          _setup;

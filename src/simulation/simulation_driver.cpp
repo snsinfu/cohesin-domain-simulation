@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <iomanip>
 #include <iostream>
@@ -455,7 +456,9 @@ simulation_driver::run_sampling(phase_config const& phase)
         if (logging_interval > 0 && step % logging_interval == 0) {
             show_progress(phase.name, step);
         }
+
         if (sampling_interval > 0 && step % sampling_interval == 0) {
+            check_sanity();
             save_sample(phase.name, step);
         }
 
@@ -537,4 +540,15 @@ simulation_driver::save_metadata()
         .chains    = chains,
         .particles = particles,
     });
+}
+
+
+void
+simulation_driver::check_sanity() const
+{
+    for (md::point const& position : _system.view_positions()) {
+        if (!std::isfinite(position.vector().norm())) {
+            throw std::runtime_error("Numerical instability");
+        }
+    }
 }
