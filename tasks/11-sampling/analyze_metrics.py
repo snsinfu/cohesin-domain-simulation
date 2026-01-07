@@ -8,7 +8,7 @@ import numpy as np
 import scipy.stats
 
 
-MSD_LAG = 11
+DEFAULT_MSD_LAG = 51
 
 
 def main(
@@ -18,6 +18,7 @@ def main(
     phase_key: str,
     worker_count: int,
     msd_lag: int,
+    subtract_centroid: bool,
 ):
     with multiprocessing.Pool(worker_count) as pool:
         results = [
@@ -28,6 +29,7 @@ def main(
                         filename=filename,
                         phase_key=phase_key,
                         msd_lag=msd_lag,
+                        subtract_centroid=subtract_centroid,
                     )
                     for filename in trajectory_files
                 ),
@@ -53,33 +55,47 @@ class Metrics:
 def do_compute_metrics(kwargs: dict) -> Metrics | None:
     try:
         return compute_metrics(**kwargs)
-    except Exception:
+    except Exception as e:
+        print(e)
         return None
 
 
-def compute_metrics(filename: str, phase_key: str, msd_lag: int) -> Metrics:
+def compute_metrics(
+    filename: str,
+    phase_key: str,
+    msd_lag: int,
+    subtract_centroid: bool,
+) -> Metrics:
     with h5py.File(filename, "r") as store:
-        config = json.loads(store["metadata/config"][()])
+        config_used = json.loads(store["metadata/config"][()])
+        config_source = json.loads(store["metadata/config_source"][()])
         phase_store = store["phases"][phase_key]
         positions_samples = load_positions_samples(phase_store)
 
-    site_msds = collect_msds(positions_samples, lag=msd_lag)
+    msd_paths = positions_samples
+    if subtract_centroid:
+        msd_paths = msd_paths - msd_paths.mean(axis=1, keepdims=True)
+    site_msds = collect_msds(msd_paths, lag=msd_lag)
 
-    # FIXME
-    boundary_index = 200
+    # Domains
+    sweep_data = config_source["@meta"]["sweep_data"]
+    interval_1, interval_2 = sweep_data["domain_intervals"]
+    slice_1 = slice(*interval_1)
+    slice_2 = slice(*interval_2)
+
     separation_history = []
     for positions in positions_samples:
         distance_matrix = compute_distance_matrix(positions)
-        D_11 = mask_lower(distance_matrix[:boundary_index, :boundary_index], k=0).mean()
-        D_12 = distance_matrix[:boundary_index, boundary_index:].mean()
-        D_22 = mask_lower(distance_matrix[boundary_index:, boundary_index:], k=0).mean()
+        D_11 = mask_lower(distance_matrix[slice_1, slice_1], k=0).mean()
+        D_12 = distance_matrix[slice_1, slice_2].mean()
+        D_22 = mask_lower(distance_matrix[slice_2, slice_2], k=0).mean()
         separation = D_12 / (D_11 + D_22)
         separation_history.append(separation)
     separation_history = np.array(separation_history)
 
     return Metrics(
         filename=filename,
-        config=config,
+        config=config_source,
         site_msds=site_msds,
         separation_history=separation_history,
     )
@@ -118,7 +134,8 @@ def parse_args() -> dict:
     parser.add_argument("--worker-count", "-j", type=int, default=1)
     parser.add_argument("--output", "-o", dest="output_file", type=str)
     parser.add_argument("--phase-key", type=str, default="production")
-    parser.add_argument("--msd-lag", type=int, default=MSD_LAG)
+    parser.add_argument("--msd-lag", type=int, default=DEFAULT_MSD_LAG)
+    parser.add_argument("--subtract-centroid", action="store_true", default=False)
     parser.add_argument("trajectory_files", type=str, nargs="*")
     return vars(parser.parse_args())
 

@@ -1,0 +1,50 @@
+
+{
+    "sampling": {
+        "timestep":         1e-5,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 10000000, "sampling_interval": 100000},
+            {"name": "production", "steps":  5000000, "sampling_interval":   5000}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "extruder_preloading":   true,
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "chain": {
+        "repulsive_distance": 1,
+        "repulsive_energy":   20,
+        "spring_length":      1,
+        "spring_constant":    200,
+        "monomer_mobility":   200
+    },
+
+    "association": {
+        "valency":              12,
+        "association_distance": 1.5,
+        "association_energy":   1,
+        "association_rate":     5000,
+        "dissociation_rate":    500
+    },
+
+    "chains": [
+        {
+            "length": 400,
+
+            "association_features": [
+                {"site": {"start": 15, "end": 17}, "valency": 1}, {"site": {"start": 49, "end": 53}, "valency": 1}, {"site": 55, "valency": 1}, {"site": 65, "valency": 1}, {"site": {"start": 76, "end": 79}, "valency": 1}, {"site": 88, "valency": 1}, {"site": {"start": 120, "end": 122}, "valency": 1}, {"site": 124, "valency": 1}, {"site": 152, "valency": 1}, {"site": 167, "valency": 1}, {"site": 173, "valency": 1}, {"site": {"start": 183, "end": 186}, "valency": 1}, {"site": 199, "valency": 1}, {"site": 209, "valency": 1}, {"site": {"start": 230, "end": 233}, "valency": 1}, {"site": {"start": 250, "end": 254}, "valency": 1}, {"site": 267, "valency": 1}, {"site": 333, "valency": 1}, {"site": {"start": 336, "end": 339}, "valency": 1}, {"site": 350, "valency": 1}, {"site": 360, "valency": 1}, {"site": 372, "valency": 1}, {"site": {"start": 398, "end": 400}, "valency": 1},
+
+                {"site": {"start": 197, "end": 204}, "valency": 0}
+            ],
+
+            "static_loops": [
+            ]
+        }
+    ]
+}
