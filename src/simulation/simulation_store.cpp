@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "h5_buffer_traits.hpp"
+#include "misc/h5_buffer_traits.hpp"
 
 
 simulation_store::simulation_store(std::string const& filename)
