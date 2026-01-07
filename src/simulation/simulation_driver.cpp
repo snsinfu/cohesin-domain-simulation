@@ -1,3 +1,4 @@
+#include <ctime>
 #include <iomanip>
 #include <iostream>
 #include <random>
@@ -479,18 +480,20 @@ simulation_driver::run_sampling(phase_config const& phase)
 void
 simulation_driver::show_progress(std::string const& phase_name, md::step step)
 {
+    std::time_t const wallclock_time = std::time(nullptr);
     double const energy = _system.compute_energy();
     std::size_t const associations = _associations->active_pairs().size();
     std::size_t const extruders = _extruders->active_pairs().size();
     std::size_t const captures = _captures->active_pairs().size();
 
     std::clog
-        << "[" << phase_name << "]"
-        << " step: " << std::setw(8) << step
-        << " | energy: " << std::setw(6) << std::setprecision(4) << energy
-        << " | assocs: " << std::setw(4) << associations
-        << " | x-loops: " << std::setw(2) << extruders
-        << " | c-loops: " << std::setw(2) << captures
+        << std::put_time(std::localtime(&wallclock_time), "[%F %T]")
+        << " [" << phase_name << "]"
+        << " step: " << step
+        << " | energy: " << std::setprecision(4) << energy
+        << " | assocs: " << associations
+        << " | x-loops: " << extruders
+        << " | c-loops: " << captures
         << std::endl;
 }
 
