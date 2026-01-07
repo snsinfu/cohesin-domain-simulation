@@ -70,8 +70,8 @@ struct chain_type_config
 /** Bead-bead association parameters. */
 struct association_type_config
 {
-    md::index  valency              = 1;
-    md::scalar association_distance = 1;
+    md::index  valency              = 0;
+    md::scalar association_distance = 0;
     md::scalar association_rate     = 0;
     md::scalar dissociation_rate    = 0;
     md::scalar association_energy   = 0;
