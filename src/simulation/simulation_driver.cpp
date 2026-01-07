@@ -490,7 +490,7 @@ simulation_driver::show_progress(std::string const& phase_name, md::step step)
     std::size_t const captures = _captures->active_pairs().size();
 
     std::clog
-        << std::put_time(std::localtime(&wallclock_time), "[%F %T]")
+        << std::put_time(std::localtime(&wallclock_time), "%F %T")
         << " [" << phase_name << "]"
         << " step: " << step
         << " | energy: " << std::setprecision(4) << energy
