@@ -1,0 +1,66 @@
+{
+    "@meta": {
+        "notes": [
+            "Δcohesin",
+            "Two moderately acetylated domains with NO loops",
+            "Container of radius 10"
+        ],
+
+        "sweep_seed":  0,
+        "sweep_count": 10,
+        "sweep_params": {
+        },
+        "extra_params": {
+            "domain_count":        2,
+            "domain_size":         200,
+            "loop_count":          0,
+            "loop_size_min":       10,
+            "loop_crossing":       false,
+            "acetylation_island":  2,
+            "acetylation_level":   0.2,
+            "acetylation_error":   0,
+            "acetylation_feature": {"valency": 1},
+            "linker_length":       5,
+            "linker_feature":      {"valency": 0}
+        }
+    },
+
+    "sampling": {
+        "timestep":         1e-5,
+        "logging_interval": 100000,
+        "phases": [
+            {"name": "relaxation", "steps": 10000000, "sampling_interval": 100000},
+            {"name": "production", "steps":  5000000, "sampling_interval":   5000}
+        ],
+        "random_seed":      0,
+        "output_filename":  "_output.h5"
+    },
+
+    "initialization": {
+        "initial_step_monomers": 10,
+        "initial_step_scale":    0.1
+    },
+
+    "environment": {
+        "container_radius":          8,
+        "container_spring_constant": 100
+    },
+
+    "chain": {
+        "repulsive_distance": 1,
+        "repulsive_energy":   20,
+        "spring_length":      1,
+        "spring_constant":    200,
+        "monomer_mobility":   200
+    },
+
+    "association": {
+        "valency":              3,
+        "association_distance": 1.5,
+        "association_energy":   5,
+        "association_rate":     200,
+        "dissociation_rate":    20
+    },
+
+    "chains": null
+}
