@@ -143,6 +143,35 @@ def plot_rect(ax: plt.Axes, lx: float, ly: float, tx: float, ty: float, **kwargs
     return rectangle
 
 
+def plot_arc(
+    ax: plt.Axes,
+    cx: float,
+    cy: float,
+    width: float,
+    height: float,
+    theta1: float,
+    theta2: float,
+    angle: float = 0,
+    **kwargs,
+) ->  mpl.patches.Rectangle:
+    """
+    Plot an arc of an ellipse centered at (cx, cy) with specified width,
+    height, and angle (in degs). The arc starts at angle theta1 and ends at
+    angle theta2.
+    """
+    arc = mpl.patches.Arc(
+        (cx, cy),
+        width,
+        height,
+        theta1=theta1,
+        theta2=theta2,
+        angle=angle,
+        **kwargs,
+    )
+    ax.add_patch(arc)
+    return arc
+
+
 def attach_colorbar(
     ax: plt.Axes,
     sm: mpl.cm.ScalarMappable,
@@ -285,6 +314,25 @@ def lerp_palette(
     colors = np.array([mpl.colors.to_rgba(nodes[key]) for key in points])
     x = np.linspace(points[0], points[-1], num=ndiv)
     return np.transpose([np.interp(x, points, colors[:, i]) for i in range(colors.shape[1])])
+
+
+def faint_color(c: any, level: float = 0.5) -> tuple[float, float, float]:
+    """
+    Make color more faint.
+    """
+    r, g, b = plt.matplotlib.colors.to_rgb(c)
+    r = (1 - level) * r + level
+    g = (1 - level) * g + level
+    b = (1 - level) * b + level
+    return r, g, b
+
+
+def reverse_legend(ax: plt.Axes) -> None:
+    """
+    Reverse the order of legend.
+    """
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(handles[::-1], labels[::-1])
 
 
 # "fall" colormap with nicer extrema, nice for showing contact heat map.

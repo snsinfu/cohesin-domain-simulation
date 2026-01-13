@@ -32,6 +32,7 @@ cmocean = "4.*"
 colorcet = "3.*"
 font-ttf-noto = "*"
 matplotlib-base = "3.*"
+seaborn = "0.13.*"
 
 # Math, numerics, data analysis and machine learning
 [feature.numerics.dependencies]
