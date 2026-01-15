@@ -101,12 +101,12 @@ simulation_driver::setup_loop_extrusion_simulator()
 {
     loop_extrusion_simulator extruders({
         .site_count       = _system.particle_count(),
-        .loading_rate     = _config.extruder.loading_rate,
-        .unloading_rate   = _config.extruder.unloading_rate,
-        .extrusion_rate   = _config.extruder.extrusion_rate,
-        .contraction_rate = _config.extruder.contraction_rate,
-        .crossing_factor  = _config.extruder.crossing_factor,
-        .max_distance     = _config.extruder.max_distance.value_or(INFINITY),
+        .loading_rate     = _config.loop_extrusion.loading_rate,
+        .unloading_rate   = _config.loop_extrusion.unloading_rate,
+        .extrusion_rate   = _config.loop_extrusion.extrusion_rate,
+        .contraction_rate = _config.loop_extrusion.contraction_rate,
+        .crossing_factor  = _config.loop_extrusion.crossing_factor,
+        .max_distance     = _config.loop_extrusion.max_distance.value_or(INFINITY),
     });
 
     auto const foreach_site = [](auto const& feature, auto callback) {
@@ -121,7 +121,7 @@ simulation_driver::setup_loop_extrusion_simulator()
     };
 
     for (auto const& chain : _setup.chains) {
-        for (auto const& feature : chain.config.extruder_features) {
+        for (auto const& feature : chain.config.loop_extrusion_features) {
             for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
                 foreach_site(feature, [&](auto index, auto dir) {
                     std::size_t const site = chain.start + index;
@@ -277,8 +277,8 @@ void
 simulation_driver::setup_forcefield_extruders()
 {
     md::spring_potential const potential {
-        .spring_constant      = _config.extruder.spring_constant,
-        .equilibrium_distance = _config.extruder.spring_length,
+        .spring_constant      = _config.loop_extrusion.spring_constant,
+        .equilibrium_distance = _config.loop_extrusion.spring_length,
     };
 
     _system.add_forcefield(
@@ -384,7 +384,7 @@ simulation_driver::run_initialization_extruders()
     for (auto const& chain : _setup.chains) {
 
         std::vector<double> affinity_mods(chain.end - chain.start, 1);
-        for (auto const& feature : chain.config.extruder_features) {
+        for (auto const& feature : chain.config.loop_extrusion_features) {
             for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
                 if (auto val = feature.loading) { affinity_mods[i] *= *val; }
                 if (auto val = feature.unloading) { affinity_mods[i] /= *val; }
@@ -395,8 +395,8 @@ simulation_driver::run_initialization_extruders()
             std::size_t const site = chain.start + i;
 
             double const affinity = affinity_mods[i]
-                * _config.extruder.loading_rate
-                / _config.extruder.unloading_rate;
+                * _config.loop_extrusion.loading_rate
+                / _config.loop_extrusion.unloading_rate;
 
             // Limit initial loading up to one for each site.
             std::poisson_distribution<int> count_distr(affinity);

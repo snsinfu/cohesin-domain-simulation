@@ -97,7 +97,7 @@ JSONCONS_N_MEMBER_TRAITS(
 
 
 JSONCONS_N_MEMBER_TRAITS(
-    extruder_type_config,
+    loop_extrusion_type_config,
 
     // Required fields
     0,
@@ -224,7 +224,7 @@ JSONCONS_ENUM_TRAITS(
 
 
 JSONCONS_N_MEMBER_TRAITS(
-    extruder_feature_config,
+    loop_extrusion_feature_config,
 
     // Required fields
     1,
@@ -287,7 +287,7 @@ JSONCONS_N_MEMBER_TRAITS(
 
     // Optional fields
     association_features,
-    extruder_features,
+    loop_extrusion_features,
     loop_capture_features,
     loop_capture_tracks,
     static_loops,
@@ -307,7 +307,7 @@ JSONCONS_N_MEMBER_TRAITS(
     initialization,
     chain,
     association,
-    extruder,
+    loop_extrusion,
     loop_capture,
     chains
 )

@@ -79,7 +79,7 @@ struct association_type_config
 
 
 /** Loop extruder parameters. */
-struct extruder_type_config
+struct loop_extrusion_type_config
 {
     md::scalar                loading_rate     = 0;
     md::scalar                unloading_rate   = 1;
@@ -151,7 +151,7 @@ enum class site_directions : unsigned
 inline bool operator&(site_directions value, site_directions mask) { return (unsigned(value) & unsigned(mask)) != 0; }
 
 /** Chain feature for overriding extruder parameters. */
-struct extruder_feature_config
+struct loop_extrusion_feature_config
 {
     site_range                site;
     site_directions           direction = site_directions::both;
@@ -205,7 +205,7 @@ struct chain_config
 {
     md::index                                      length;
     std::vector<association_feature_config>        association_features;
-    std::vector<extruder_feature_config>           extruder_features;
+    std::vector<loop_extrusion_feature_config>     loop_extrusion_features;
     std::vector<loop_capture_feature_config>       loop_capture_features;
     std::vector<loop_capture_track_config>         loop_capture_tracks;
     std::vector<static_loop_config>                static_loops;
@@ -216,15 +216,15 @@ struct chain_config
 /** . */
 struct simulation_config
 {
-    sampling_config           sampling;
-    environment_config        environment;
-    initialization_config     initialization;
-    chain_type_config         chain;
-    association_type_config   association;
-    extruder_type_config      extruder;
-    loop_capture_type_config  loop_capture;
-    std::vector<chain_config> chains;
-    std::string               config_text;
+    sampling_config            sampling;
+    environment_config         environment;
+    initialization_config      initialization;
+    chain_type_config          chain;
+    association_type_config    association;
+    loop_extrusion_type_config loop_extrusion;
+    loop_capture_type_config   loop_capture;
+    std::vector<chain_config>  chains;
+    std::string                config_text;
 };
 
 
