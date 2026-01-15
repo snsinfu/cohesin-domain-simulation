@@ -58,6 +58,13 @@ loop_capture_simulator::set_capture_factor(std::size_t site, double factor)
 
 
 void
+loop_capture_simulator::set_traffic_factor(std::size_t site, double factor)
+{
+    _sites[site].traffic_factor = factor;
+}
+
+
+void
 loop_capture_simulator::set_release_factor(std::size_t site, double factor)
 {
     _sites[site].release_factor = factor;
@@ -88,7 +95,8 @@ loop_capture_simulator::step(double dt, structure_data const& structure, random_
     step_loading(dt, random);
     step_release(dt, random);
     step_capture(dt, structure, random);
-    step_sliding(dt, random);
+    step_diffusion(dt, random);
+    step_traffic(dt, random);
 }
 
 
@@ -226,27 +234,26 @@ loop_capture_simulator::step_release(double dt, random_engine& random)
             continue;
         }
 
-        std::size_t const captured_site = *cohesin.captured_site;
-        double const effective_rate =
-            _config.release_rate * _sites[captured_site].release_factor;
+        std::size_t const site = *cohesin.captured_site;
+        double const event_rate = _config.release_rate * _sites[site].release_factor;
 
-        if (poisson_process(effective_rate, dt, random)) {
-            _capture_count--;
-            _sites[captured_site].occupancy--;
+        if (poisson_process(event_rate, dt, random)) {
             cohesin.captured_site = std::nullopt;
+            _sites[site].occupancy--;
         }
     }
 }
 
 
 void
-loop_capture_simulator::step_sliding(double dt, random_engine& random)
+loop_capture_simulator::step_diffusion(double dt, random_engine& random)
 {
     auto const compute_arrival_factor = [&](site_data const& site) {
         return site.arrival_factor * small_pow(_config.crossing_factor, site.occupancy);
     };
 
     auto const displace = [&](cohesin_data& cohesin, std::size_t dest_site) {
+        assert(dest_site < _config.site_count);
         _sites[cohesin.loaded_site].occupancy--;
         _sites[dest_site].occupancy++;
         cohesin.loaded_site = dest_site;
@@ -268,8 +275,8 @@ loop_capture_simulator::step_sliding(double dt, random_engine& random)
                 compute_arrival_factor(_sites[cohesin.loaded_site + 1]) : 0;
 
         // Use Gillespie algorithm to choose which direction to move to.
-        double const minus_rate = _config.linear_diffusivity * departure * minus_arrival;
-        double const plus_rate = _config.linear_diffusivity * departure * plus_arrival;
+        double const minus_rate = _config.diffusivity * departure * minus_arrival;
+        double const plus_rate = _config.diffusivity * departure * plus_arrival;
         double const event_rate = minus_rate + plus_rate;
 
         if (poisson_process(event_rate, dt, random)) {
@@ -279,6 +286,43 @@ loop_capture_simulator::step_sliding(double dt, random_engine& random)
             } else {
                 displace(cohesin, cohesin.loaded_site + 1);
             }
+        }
+    }
+}
+
+
+void
+loop_capture_simulator::step_traffic(double dt, random_engine& random)
+{
+    auto const displace = [&](cohesin_data& cohesin, std::size_t dest_site) {
+        assert(dest_site < _config.site_count);
+        std::size_t const curr_site = *cohesin.captured_site;
+        cohesin.captured_site = dest_site;
+        _sites[curr_site].occupancy--;
+        _sites[dest_site].occupancy++;
+    };
+
+    for (cohesin_data& cohesin : _cohesins) {
+        if (!cohesin.captured_site) {
+            continue;
+        }
+
+        std::size_t const curr_site = *cohesin.captured_site;
+        double const speed = _config.traffic_rate * _sites[curr_site].traffic_factor;
+
+        if (curr_site == 0 && speed < 0) {
+            continue;
+        }
+        if (curr_site + 1 == _config.site_count && speed > 0) {
+            continue;
+        }
+
+        std::size_t const dest_site = speed > 0 ? curr_site + 1 : curr_site - 1;
+        double const arrival = small_pow(_config.crossing_factor, _sites[dest_site].occupancy);
+        double const event_rate = std::fabs(speed) * arrival;
+
+        if (poisson_process(event_rate, dt, random)) {
+            displace(cohesin, dest_site);
         }
     }
 }

@@ -18,13 +18,14 @@ public:
     struct config_type
     {
         std::size_t site_count;
-        double      loading_rate       = 0;
-        double      unloading_rate     = 1;
-        double      capture_distance   = 0;
-        double      capture_rate       = 0;
-        double      release_rate       = 1;
-        double      crossing_factor    = 0;
-        double      linear_diffusivity = 0;
+        double      loading_rate     = 0;
+        double      unloading_rate   = 1;
+        double      diffusivity      = 0;
+        double      crossing_factor  = 0;
+        double      capture_distance = 0;
+        double      capture_rate     = 0;
+        double      release_rate     = 1;
+        double      traffic_rate     = 0;
     };
 
     struct snapshot_type
@@ -56,6 +57,7 @@ public:
     void set_unloading_factor(std::size_t site, double factor);
     void set_capture_factor(std::size_t site, double factor);
     void set_release_factor(std::size_t site, double factor);
+    void set_traffic_factor(std::size_t site, double factor);
     void set_arrival_factor(std::size_t site, double factor);
     void set_departure_factor(std::size_t site, double factor);
 
@@ -70,8 +72,9 @@ private:
         unsigned occupancy        = 0;
         double   loading_factor   = 1;
         double   unloading_factor = 1;
-        double   capture_factor   = 1;
+        double   capture_factor   = 0;  // default to no capture; only captures genes
         double   release_factor   = 1;
+        double   traffic_factor   = 0;  // default to no traffic; only transported on genes
         double   arrival_factor   = 1;
         double   departure_factor = 1;
     };
@@ -87,7 +90,8 @@ private:
     void step_loading(double dt, random_engine& random);
     void step_release(double dt, random_engine& random);
     void step_capture(double dt, structure_data const& structure, random_engine& random);
-    void step_sliding(double dt, random_engine& random);
+    void step_diffusion(double dt, random_engine& random);
+    void step_traffic(double dt, random_engine& random);
 
     void debug_check_invariant() const;
 

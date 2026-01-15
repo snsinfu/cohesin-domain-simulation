@@ -153,14 +153,15 @@ void
 simulation_driver::setup_loop_capture_simulator()
 {
     loop_capture_simulator captures({
-        .site_count         = _system.particle_count(),
-        .loading_rate       = _config.loop_capture.loading_rate,
-        .unloading_rate     = _config.loop_capture.unloading_rate,
-        .capture_distance   = _config.loop_capture.capture_distance,
-        .capture_rate       = _config.loop_capture.capture_rate,
-        .release_rate       = _config.loop_capture.release_rate,
-        .crossing_factor    = _config.loop_capture.crossing_factor,
-        .linear_diffusivity = _config.loop_capture.linear_diffusivity,
+        .site_count       = _system.particle_count(),
+        .loading_rate     = _config.loop_capture.loading_rate,
+        .unloading_rate   = _config.loop_capture.unloading_rate,
+        .diffusivity      = _config.loop_capture.diffusivity,
+        .crossing_factor  = _config.loop_capture.crossing_factor,
+        .capture_distance = _config.loop_capture.capture_distance,
+        .capture_rate     = _config.loop_capture.capture_rate,
+        .release_rate     = _config.loop_capture.release_rate,
+        .traffic_rate     = _config.loop_capture.traffic_rate,
     });
 
     for (auto const& chain : _setup.chains) {
@@ -169,8 +170,17 @@ simulation_driver::setup_loop_capture_simulator()
                 std::size_t const site = chain.start + i;
                 if (auto val = feature.loading) { captures.set_loading_factor(site, *val); }
                 if (auto val = feature.unloading) { captures.set_unloading_factor(site, *val); }
-                if (auto val = feature.capture) { captures.set_capture_factor(site, *val); }
-                if (auto val = feature.release) { captures.set_release_factor(site, *val); }
+            }
+        }
+        for (auto const& track : chain.config.loop_capture_tracks) {
+            double const sign = (track.start < track.end ? +1 : -1);
+            std::size_t const lower = std::min(track.start, track.end);
+            std::size_t const upper = std::max(track.start, track.end);
+            for (std::size_t i = lower; i <= upper; i++) {
+                std::size_t const site = chain.start + i;
+                captures.set_capture_factor(site, track.capture.value_or(1));
+                captures.set_release_factor(site, track.release.value_or(1));
+                captures.set_traffic_factor(site, track.traffic.value_or(1) * sign);
             }
         }
     }
