@@ -100,11 +100,12 @@ struct loop_capture_type_config
 {
     md::scalar loading_rate       = 0;
     md::scalar unloading_rate     = 1;
+    md::scalar diffusivity        = 0;
     md::scalar capture_distance   = 1;
     md::scalar capture_rate       = 0;
     md::scalar release_rate       = 1;
+    md::scalar traffic_rate       = 0;
     md::scalar crossing_factor    = 1;
-    md::scalar linear_diffusivity = 0;
     md::scalar spring_length      = 0;
     md::scalar spring_constant    = 0;
 };
@@ -170,8 +171,23 @@ struct loop_capture_feature_config
     site_range                site;
     std::optional<md::scalar> loading;
     std::optional<md::scalar> unloading;
+    std::optional<md::scalar> arrival;
+    std::optional<md::scalar> departure;
+};
+
+
+/**
+ * Chain feature for defining transportation tracks for loop capturing cohesin.
+ * Models genes. Cohesin captures the starting site (TSS), one-directionally
+ * transported over the track, and stops at the ending site (TES).
+ */
+struct loop_capture_track_config
+{
+    md::index                 start;
+    md::index                 end;
     std::optional<md::scalar> capture;
     std::optional<md::scalar> release;
+    std::optional<md::scalar> traffic;
 };
 
 
@@ -191,6 +207,7 @@ struct chain_config
     std::vector<association_feature_config>        association_features;
     std::vector<extruder_feature_config>           extruder_features;
     std::vector<loop_capture_feature_config>       loop_capture_features;
+    std::vector<loop_capture_track_config>         loop_capture_tracks;
     std::vector<static_loop_config>                static_loops;
     std::map<std::string, std::vector<md::scalar>> attributes;
 };

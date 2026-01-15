@@ -39,7 +39,6 @@ JSONCONS_N_MEMBER_TRAITS(
 
 JSONCONS_N_MEMBER_TRAITS(
     environment_config,
-
     // Required fields
     0,
 
@@ -124,11 +123,12 @@ JSONCONS_N_MEMBER_TRAITS(
     // Optional fields
     loading_rate,
     unloading_rate,
+    diffusivity,
     capture_distance,
     capture_rate,
     release_rate,
+    traffic_rate,
     crossing_factor,
-    linear_diffusivity,
     spring_length,
     spring_constant
 )
@@ -249,8 +249,23 @@ JSONCONS_N_MEMBER_TRAITS(
     // Optional fields
     loading,
     unloading,
+    arrival,
+    departure
+)
+
+
+JSONCONS_N_MEMBER_TRAITS(
+    loop_capture_track_config,
+
+    // Required fields
+    2,
+    start,
+    end,
+
+    // Optional fields
     capture,
-    release
+    release,
+    traffic
 )
 
 
@@ -274,6 +289,7 @@ JSONCONS_N_MEMBER_TRAITS(
     association_features,
     extruder_features,
     loop_capture_features,
+    loop_capture_tracks,
     static_loops,
     attributes
 )
