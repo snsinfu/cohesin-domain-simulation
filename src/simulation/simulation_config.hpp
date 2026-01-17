@@ -19,6 +19,7 @@ struct phase_config
     std::optional<md::scalar> timestep;
     std::optional<md::step>   logging_interval;
     std::optional<md::step>   sampling_interval;
+    std::optional<md::scalar> spring_factor;
 };
 
 

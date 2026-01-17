@@ -230,9 +230,11 @@ simulation_driver::setup_forcefield_connectivity()
 {
     auto bonds = _system.add_forcefield(
         md::make_bonded_pairwise_forcefield(
-            md::spring_potential {
-                .spring_constant      = _config.chain.spring_constant,
-                .equilibrium_distance = _config.chain.spring_length,
+            [&, this](md::index, md::index) {
+                return md::spring_potential {
+                    .spring_constant      = _config.chain.spring_constant * _spring_factor,
+                    .equilibrium_distance = _config.chain.spring_length,
+                };
             }
         )
     );
@@ -268,7 +270,7 @@ simulation_driver::setup_forcefield_associations()
     };
 
     _system.add_forcefield(
-        activated_interaction_forcefield(_associations, potential, _setup.box)
+        make_activated_interaction_forcefield(_associations, potential, _setup.box)
     );
 }
 
@@ -276,13 +278,15 @@ simulation_driver::setup_forcefield_associations()
 void
 simulation_driver::setup_forcefield_extruders()
 {
-    md::spring_potential const potential {
-        .spring_constant      = _config.loop_extrusion.spring_constant,
-        .equilibrium_distance = _config.loop_extrusion.spring_length,
+    auto const potential = [&, this](md::index, md::index) {
+        return md::spring_potential {
+            .spring_constant      = _config.loop_extrusion.spring_constant * _spring_factor,
+            .equilibrium_distance = _config.loop_extrusion.spring_length,
+        };
     };
 
     _system.add_forcefield(
-        activated_interaction_forcefield(_extruders, potential, _setup.box)
+        make_activated_interaction_forcefield(_extruders, potential, _setup.box)
     );
 }
 
@@ -290,13 +294,15 @@ simulation_driver::setup_forcefield_extruders()
 void
 simulation_driver::setup_forcefield_captures()
 {
-    md::spring_potential const potential {
-        .spring_constant      = _config.loop_capture.spring_constant,
-        .equilibrium_distance = _config.loop_capture.spring_length,
+    auto const potential = [&, this](md::index, md::index) {
+        return md::spring_potential {
+            .spring_constant      = _config.loop_capture.spring_constant * _spring_factor,
+            .equilibrium_distance = _config.loop_capture.spring_length,
+        };
     };
 
     _system.add_forcefield(
-        activated_interaction_forcefield(_captures, potential, _setup.box)
+        make_activated_interaction_forcefield(_captures, potential, _setup.box)
     );
 }
 
@@ -461,6 +467,8 @@ simulation_driver::run_sampling(phase_config const& phase)
     md::step const sampling_interval = phase.sampling_interval.value_or(_config.sampling.sampling_interval);
     md::step const logging_interval = phase.logging_interval.value_or(_config.sampling.logging_interval);
     md::scalar const timestep = phase.timestep.value_or(_config.sampling.timestep);
+
+    _spring_factor = phase.spring_factor.value_or(1);
 
     auto const callback = [&, this](md::step step) {
         if (logging_interval > 0 && step % logging_interval == 0) {

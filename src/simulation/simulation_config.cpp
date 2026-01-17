@@ -18,7 +18,8 @@ JSONCONS_N_MEMBER_TRAITS(
     // Optional fields
     timestep,
     logging_interval,
-    sampling_interval
+    sampling_interval,
+    spring_factor
 )
 
 JSONCONS_N_MEMBER_TRAITS(

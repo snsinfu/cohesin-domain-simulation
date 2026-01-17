@@ -68,4 +68,5 @@ private:
     std::shared_ptr<association_simulator>    _associations;
     std::shared_ptr<loop_extrusion_simulator> _extruders;
     std::shared_ptr<loop_capture_simulator>   _captures;
+    md::scalar                                _spring_factor = 1;
 };

@@ -10,17 +10,17 @@
  * Forcefield for integrating pairwise interactions activated by an
  * independent simulation. See simulators in the reactions directory.
  */
-template<typename Simulator, typename Potential, typename Box>
+template<typename Simulator, typename PotFun, typename Box>
 class activated_interaction_forcefield : public md::forcefield
 {
 public:
     using simulator_type = Simulator;
-    using potential_type = Potential;
+    using potfun_type = PotFun;
     using box_type = Box;
 
     activated_interaction_forcefield(
         std::shared_ptr<simulator_type const> const& simulator,
-        potential_type const&                        potential,
+        potfun_type const&                           potfun,
         box_type const&                              box
     );
 
@@ -29,7 +29,7 @@ public:
 
 private:
     std::shared_ptr<simulator_type const> _simulator;
-    potential_type                        _potential;
+    potfun_type                           _potfun;
     box_type                              _box;
 };
 
@@ -37,19 +37,34 @@ private:
 template<typename S, typename P, typename B>
 activated_interaction_forcefield(
     std::shared_ptr<S> const& simulator,
-    P const&                  potential,
+    P const&                  potfun,
     B const&                  box
 )
 -> activated_interaction_forcefield<std::decay_t<S>, P, B>;
 
 
 template<typename S, typename P, typename B>
+auto make_activated_interaction_forcefield(
+    std::shared_ptr<S> const& simulator,
+    P const&                  pot,
+    B const&                  box
+)
+{
+    return activated_interaction_forcefield(
+        simulator,
+        md::detail::make_pair_potential_factory(pot),
+        box
+    );
+}
+
+
+template<typename S, typename P, typename B>
 activated_interaction_forcefield<S, P, B>::activated_interaction_forcefield(
     std::shared_ptr<simulator_type const> const& simulator,
-    potential_type const&                        potential,
+    potfun_type const&                           potfun,
     box_type const&                              box
 )
-: _simulator{simulator}, _potential{potential}, _box{box}
+: _simulator{simulator}, _potfun{potfun}, _box{box}
 {
 }
 
@@ -64,8 +79,9 @@ activated_interaction_forcefield<S, P, B>::compute_energy(
     md::scalar energy = 0;
 
     for (auto const& pair : _simulator->active_pairs()) {
+        auto const potential = _potfun(system, pair.i, pair.j);
         auto const r_ij = _box.shortest_displacement(positions[pair.i], positions[pair.j]);
-        energy += _potential.evaluate_energy(r_ij);
+        energy += potential.evaluate_energy(r_ij);
     }
 
     return energy;
@@ -82,8 +98,9 @@ activated_interaction_forcefield<S, P, B>::compute_force(
     auto const positions = system.view_positions();
 
     for (auto const& pair : _simulator->active_pairs()) {
+        auto const potential = _potfun(system, pair.i, pair.j);
         auto const r_ij = _box.shortest_displacement(positions[pair.i], positions[pair.j]);
-        auto const f_ij = _potential.evaluate_force(r_ij);
+        auto const f_ij = potential.evaluate_force(r_ij);
         forces[pair.i] += f_ij;
         forces[pair.j] -= f_ij;
     }

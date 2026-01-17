@@ -17,4 +17,4 @@ OPTFLAGS += \
   -fuse-ld=lld
 
 DBGFLAGS += \
-  -DNDEBUG_
+  -DNDEBUG
