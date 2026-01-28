@@ -240,6 +240,7 @@ loop_capture_simulator::step_release(double dt, random_engine& random)
         if (poisson_process(event_rate, dt, random)) {
             cohesin.captured_site = std::nullopt;
             _sites[site].occupancy--;
+            _capture_count--;
         }
     }
 }
