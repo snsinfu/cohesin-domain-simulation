@@ -19,8 +19,20 @@ Build the simulation program:
 cd src/simulation
 pixi run make -j
 ```
-The simulation program (executable named `main`) takes a JSON configuration and
-writes a custom HDF5 trajectory file. Run a sample simulation:
+
+You may need to edit `overrides.mk` to correctly specify the CPU architecture.
+If you simply run the program on the same machine, change `OPTFLAGS` macro in
+the file to the following:
+
+```
+OPTFLAGS += \
+  -march=native \
+  -flto \
+  -fuse-ld=lld
+```
+
+The simulation program (executable named `main`) takes a JSON configuration file
+and writes a custom HDF5 trajectory file. Run a sample simulation:
 
 ```
 ./main sample.json
