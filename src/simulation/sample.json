@@ -1,0 +1,109 @@
+{
+    "sampling": {
+        "timestep":                     1e-5,
+        "sampling_interval":            1000,
+        "logging_interval":             100000,
+        "phases": [
+            {"name": "relaxation_pre",  "timestep": 1e-6, "steps":   100000, "sampling_interval": 100000, "spring_factor": 0.1},
+            {"name": "relaxation",      "timestep": 1e-4, "steps": 10000000, "sampling_interval": 100000, "spring_factor": 0.1},
+            {"name": "relaxation_post", "timestep": 1e-5, "steps":   100000, "sampling_interval": 100000},
+            {"name": "production",      "timestep": 1e-5, "steps":  5000000, "sampling_interval":   5000}
+        ],
+        "random_seed":                  0,
+        "output_filename":              "output.h5"
+    },
+
+    "environment": {
+        "temperature":                  1,
+        "container_radius":             0,
+        "container_spring_constant":    0
+    },
+
+    "initialization": {
+        "preload_cohesin":              false,
+        "initial_step_monomers":        10,
+        "initial_step_scale":           0.1
+    },
+
+    "chain": {
+        "repulsive_distance":           1,
+        "repulsive_energy":             20,
+        "attractive_distance":          0,
+        "attractive_energy":            0,
+        "spring_length":                1,
+        "spring_constant":              100,
+        "angle_preference":             0,
+        "angle_energy":                 0,
+        "monomer_mobility":             200
+    },
+
+    "association": {
+        "valency":                      3,
+        "association_distance":         1.5,
+        "association_energy":           5,
+        "association_rate":             200,
+        "dissociation_rate":            50
+    },
+
+    "loop_extrusion": {
+        "loading_rate":                 0,
+        "unloading_rate":               1.0e-3,
+        "extrusion_rate":               0.5,
+        "contraction_rate":             0,
+        "crossing_factor":              0,
+        "spring_length":                1,
+        "spring_constant":              100
+    },
+
+    "loop_capture": {
+        "loading_rate":                 0,
+        "unloading_rate":               1.0e-3,
+        "diffusivity":                  0,
+        "capture_distance":             1.5,
+        "capture_rate":                 200,
+        "release_rate":                 0.20e-3,
+        "traffic_rate":                 0.05,
+        "crossing_factor":              0,
+        "spring_length":                1,
+        "spring_constant":              100
+    },
+
+    "chains": [
+        {
+            "length":                   400,
+
+            "association_features": [
+                {
+                    "site":             {"start": 0, "end": 10},
+                    "association":      1,
+                    "dissociation":     1,
+                    "valency":          1
+                }
+            ],
+
+            "loop_extrusion_features": [
+                {
+                    "site":             {"start": 10, "end": 20},
+                    "loading":          1,
+                    "unloading":        1
+                }
+            ],
+
+            "loop_capture_features": [
+                {
+                    "site":             {"start": 10, "end": 20},
+                    "loading":          1,
+                    "unloading":        1
+                }
+            ],
+
+            "loop_capture_tracks": [
+                {"start": 100, "end": 150}
+            ],
+
+            "static_loops": [
+                {"pair": [10, 100]}
+            ]
+        }
+    ]
+}
