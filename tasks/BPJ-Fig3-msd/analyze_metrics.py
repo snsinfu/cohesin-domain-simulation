@@ -59,6 +59,7 @@ def main(
         store["chain_rgs"] = [r.chain_rgs for r in results]
         store["loop_counts"] = [r.loop_counts for r in results]
         store["loop_coverages"] = [r.loop_coverages for r in results]
+        store["loop_coverages_nonred"] = [r.loop_coverages_nonred for r in results]
 
 
 @dataclasses.dataclass
@@ -66,10 +67,11 @@ class Metrics:
     filename: str
     config_used: dict
     config_source: dict
-    site_msds: np.ndarray       # (time, site)
-    chain_rgs: np.ndarray       # (time)
-    loop_counts: np.ndarray     # (time)
-    loop_coverages: np.ndarray  # (time)
+    site_msds: np.ndarray               # (time, site)
+    chain_rgs: np.ndarray               # (time)
+    loop_counts: np.ndarray             # (time)
+    loop_coverages: np.ndarray          # (time)
+    loop_coverages_nonred: np.ndarray   # (time)
 
 
 def do_compute_metrics(kwargs: dict) -> Metrics | None:
@@ -105,16 +107,20 @@ def compute_metrics(
     ])
 
     # Dynamic loops
+    chain_length = trajectory.positions_history.shape[1]
     loop_counts = np.zeros(trajectory.frame_count, dtype=int)
     loop_coverages = np.zeros(trajectory.frame_count, dtype=int)
+    loop_states = np.zeros((trajectory.frame_count, chain_length), dtype=int)
 
     def _accumulate_loop_stats(loop_histories):
         for history in loop_histories.values():
             for age, (i, j) in enumerate(history.sites_history):
                 frame_index = history.birth_frame + age
                 if i != j:
+                    i, j = sorted((i, j))
                     loop_counts[frame_index] += 1
-                    loop_coverages[frame_index] += abs(i - j) + 1
+                    loop_coverages[frame_index] += j - i + 1
+                    loop_states[frame_index, i:j + 1] = 1
 
     _accumulate_loop_stats(trajectory.loop_extrusion_history)
     _accumulate_loop_stats(trajectory.loop_capture_history)
@@ -122,9 +128,12 @@ def compute_metrics(
     # Static loops
     chain_used, = config_used["chains"]
     for loop in chain_used["static_loops"]:
-        i, j = loop["pair"]
+        i, j = sorted(loop["pair"])
         loop_counts[:] += 1
-        loop_coverages[:] += abs(i - j) + 1
+        loop_coverages[:] += j - i + 1
+        loop_states[frame_index, i:j + 1] = 1
+
+    loop_coverages_nonred = loop_states.sum(axis=1)
 
     return Metrics(
         filename=filename,
@@ -134,6 +143,7 @@ def compute_metrics(
         chain_rgs=chain_rgs,
         loop_counts=loop_counts,
         loop_coverages=loop_coverages,
+        loop_coverages_nonred=loop_coverages_nonred,
     )
 
 
