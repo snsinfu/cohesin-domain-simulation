@@ -194,7 +194,7 @@ class CohesinMod(TopologyMod):
         snapshot: h5py.Group,
     ) -> ParticlesData:
         positions = snapshot["positions"][:]
-        cohesin_bonds = [(i, j) for i, j in snapshot["extruders/sites"]]
+        cohesin_bonds = self._extract_cohesin_bonds(snapshot)
         cohesin_positions = np.reshape(
             [(positions[i] + positions[j]) / 2 for i, j in cohesin_bonds],
             (-1, DIMENSION),
@@ -213,11 +213,20 @@ class CohesinMod(TopologyMod):
         metadata: h5py.Group,
         snapshot: h5py.Group,
     ) -> BondsData:
-        cohesin_bonds = [(i, j) for i, j in snapshot["extruders/sites"]]
+        cohesin_bonds = self._extract_cohesin_bonds(snapshot)
         return BondsData(
             pairs=cohesin_bonds,
             type_ids=([0] * len(cohesin_bonds)),
             type_names=[self.BOND_TYPE],
+        )
+
+    def _extract_cohesin_bonds(
+        self,
+        snapshot: h5py.Group,
+    ) -> list[tuple[int, int]]:
+        return (
+            [(i, j) for i, j in snapshot["extruders/sites"] if i != j] +
+            [(i, j) for i, j in snapshot["captures/sites"] if i != j]
         )
 
 
