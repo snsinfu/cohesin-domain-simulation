@@ -20,13 +20,15 @@ cd src/simulation
 pixi run make -j
 ```
 
-You may need to edit `overrides.mk` to correctly specify the CPU architecture.
-If you simply run the program on the same machine, change `OPTFLAGS` macro in
-the file to the following:
+You may want to edit `overrides.mk` in the source directory to correctly specify
+the CPU architecture. Default is to use the one on the machine compiling the
+program. Change `OPTFLAGS` macro in the file like the following to compile and
+optimize for specific hardware:
 
 ```
 OPTFLAGS += \
-  -march=native \
+  -march=x86-64-v3 \
+  -tune=znver2 \
   -flto \
   -fuse-ld=lld
 ```
@@ -45,5 +47,5 @@ and visualized using [OVITO](https://www.ovito.org/).
 pixi run python ../dump_gsd.py output.h5 output.gsd
 ```
 
-For statistical analysis under different conditions, see the
-`tasks/P1-cohesin_nucleosome` directory.
+For statistical analysis under different conditions, see the directories under
+the `tasks` directory.

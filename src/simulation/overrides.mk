@@ -11,8 +11,7 @@ CXXFLAGS += \
   -Wno-unused-command-line-argument
 
 OPTFLAGS += \
-  -march=x86-64-v3 \
-  -mtune=znver2 \
+  -march=native \
   -flto \
   -fuse-ld=lld
 
