@@ -283,10 +283,12 @@ def generate_binary_pattern(
         return [1] * length
 
     if phi > 0.5:
+        inverse_phi = 1 - phi
+        inverse_island_size = island_size * inverse_phi / phi
         inverse_pattern = generate_binary_pattern(
             length,
-            phi=(1 - phi),
-            island_size=island_size,
+            phi=inverse_phi,
+            island_size=inverse_island_size,
             random=random,
         )
         return [1 - x for x in inverse_pattern]
