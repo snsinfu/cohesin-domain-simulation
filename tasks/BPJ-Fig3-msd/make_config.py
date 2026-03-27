@@ -46,7 +46,8 @@ def resolve_config(
     static_loop_size_min: int,
     static_loop_size_max: int | str | None = None,
     static_loop_crossable: bool,
-    gene_count: int,
+    gene_count: int | None = None,
+    gene_fraction: int | None = None,
     gene_size: float,
     gene_size_min: int,
     random: np.random.Generator,
@@ -64,6 +65,9 @@ def resolve_config(
         case str(spec):
             raise Exception(f"Unrecognized keyword '{spec}' for static_loop_size_max")
 
+    if (int(gene_count is None) ^ int(gene_fraction is None)) == 0:
+        raise Exception("Either gene_count or gene_fraction must be specified")
+
     islands = generate_acetyl_islands(
         chain_length,
         acetylation_level,
@@ -74,6 +78,7 @@ def resolve_config(
     genes = generate_genes(
         chain_length,
         count=gene_count,
+        fraction=gene_fraction,
         avg_size=gene_size,
         min_size=gene_size_min,
         random=gene_random,
@@ -176,22 +181,27 @@ class Gene:
 
 def generate_genes(
     chain_length: int,
-    count: int,
+    count: int | None,
+    fraction: float | None,
     *,
     avg_size: float,
     min_size: int,
     random: np.random.Generator,
 ) -> list[Gene]:
+
+    if fraction is None:
+        fraction = avg_size * count / chain_length
+
     while True:
         pattern = generate_binary_pattern(
             chain_length,
-            phi=(avg_size * count / chain_length),
+            phi=fraction,
             island_size=avg_size,
             random=random,
         )
         intervals = derive_active_intervals(pattern)
 
-        if len(intervals) != count:
+        if count is not None and len(intervals) != count:
             continue
 
         sizes = [(e - s) for s, e in intervals]
