@@ -49,7 +49,11 @@ def resolve_config(
     gene_count: int | None = None,
     gene_fraction: int | None = None,
     gene_size: float,
-    gene_size_min: int,
+    gene_size_min: int = 1,
+    gene_count_min: int = 0,
+    LC_loading_rate: float | None = None,
+    LC_unloading_rate: float | None = None,
+    LC_traffic_rate: float | None = None,
     random: np.random.Generator,
 ) -> tuple[dict, dict]:
     config = copy.deepcopy(config)
@@ -81,6 +85,7 @@ def resolve_config(
         fraction=gene_fraction,
         avg_size=gene_size,
         min_size=gene_size_min,
+        min_count=gene_count_min,
         random=gene_random,
     )
 
@@ -120,6 +125,10 @@ def resolve_config(
         {"start": gene.tss, "end": gene.tes} for gene in genes
     ]
 
+    gene_occupancy = sum(abs(gene.tes - gene.tss) for gene in genes)
+    info["realized_gene_size"] = gene_occupancy / len(genes)
+    info["realized_gene_fraction"] = gene_occupancy / chain_length
+
     # Define static loops on the chain.
     static_loops = [
         {"pair": [loop.site_1, loop.site_2]} for loop in loops
@@ -134,6 +143,18 @@ def resolve_config(
             "static_loops": static_loops,
         }
     ]
+
+    # Override parameters
+    def not_none(params: dict) -> dict:
+        return {key: value for key, value in params.items() if value is not None}
+
+    config.setdefault("loop_capture", {}).update(
+        not_none({
+            "loading_rate": LC_loading_rate,
+            "unloading_rate": LC_unloading_rate,
+            "traffic_rate": LC_traffic_rate,
+        })
+    )
 
     return config, info
 
@@ -185,11 +206,12 @@ def generate_genes(
     fraction: float | None,
     *,
     avg_size: float,
-    min_size: int,
+    min_size: int = 1,
+    min_count: int = 0,
     random: np.random.Generator,
 ) -> list[Gene]:
 
-    if fraction is None:
+    if fraction is None and count is not None:
         fraction = avg_size * count / chain_length
 
     while True:
@@ -203,9 +225,11 @@ def generate_genes(
 
         if count is not None and len(intervals) != count:
             continue
+        if len(intervals) < min_count:
+            continue
 
         sizes = [(e - s) for s, e in intervals]
-        if min(sizes) < min_size:
+        if sizes and min(sizes) < min_size:
             continue
 
         break # accept

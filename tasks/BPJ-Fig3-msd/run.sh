@@ -7,8 +7,10 @@ cd "${PBS_O_WORKDIR:-.}"
 
 task_id="${PBS_ARRAYID:-${1:-0}}"
 
-config_id="$((task_id / 10))"
-instance_id="$((task_id % 10))"
+replica_count="${REPLICA_COUNT:-10}"
+replica_offset="${REPLICA_OFFSET:-0}"
+config_id="$((task_id / replica_count))"
+instance_id="$((task_id % replica_count + replica_offset))"
 
 seed="${task_id}"
 config="_configs/config-${config_id}.json"

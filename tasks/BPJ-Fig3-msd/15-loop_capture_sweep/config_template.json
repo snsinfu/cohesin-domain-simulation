@@ -1,0 +1,70 @@
+{
+    "@meta": {
+        "sweep_specs": {
+            "gene_size":                [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+            "LC_traffic_rate":          [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10]
+        },
+        "config_params": {
+            "chain_length":             200,
+            "acetylation_level":        0.2,
+            "acetylation_size":         2,
+            "acetylation_feature":      {"valency": 1},
+            "static_loop_count":        0,
+            "static_loop_size_min":     30,
+            "static_loop_crossable":    false,
+            "gene_fraction":            0.7,
+            "gene_size_min":            1,
+            "gene_count_min":           1
+        },
+        "config_seed":                  0
+    },
+
+    "sampling": {
+        "logging_interval":             100000,
+        "phases": [
+            {"name": "relaxation_pre",  "timestep": 1e-6, "steps":   100000, "sampling_interval": 100000, "spring_factor": 0.1},
+            {"name": "relaxation",      "timestep": 1e-4, "steps": 50000000, "sampling_interval": 100000, "spring_factor": 0.1},
+            {"name": "relaxation_post", "timestep": 1e-5, "steps":   100000, "sampling_interval": 100000},
+            {"name": "production",      "timestep": 1e-5, "steps":  5000000, "sampling_interval":   5000}
+        ],
+        "random_seed":                  0,
+        "output_filename":              "_output.h5"
+    },
+
+    "initialization": {
+        "preload_cohesin":              false,
+        "initial_step_monomers":        10,
+        "initial_step_scale":           0.1
+    },
+
+    "chain": {
+        "repulsive_distance":           1,
+        "repulsive_energy":             20,
+        "spring_length":                1,
+        "spring_constant":              100,
+        "monomer_mobility":             200
+    },
+
+    "association": {
+        "valency":                      3,
+        "association_distance":         1.5,
+        "association_energy":           5,
+        "association_rate":             200,
+        "dissociation_rate":            50
+    },
+
+    "loop_capture": {
+        "loading_rate":                 12.5e-5,
+        "unloading_rate":               1.0e-3,
+        "diffusivity":                  0,
+        "capture_distance":             1.5,
+        "capture_rate":                 200,
+        "release_rate":                 5.00e-3,
+        "traffic_rate":                 0.05,
+        "crossing_factor":              0,
+        "spring_length":                1,
+        "spring_constant":              100
+    },
+
+    "chains": null
+}
