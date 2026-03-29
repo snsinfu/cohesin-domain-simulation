@@ -12,7 +12,8 @@ replica_offset="${REPLICA_OFFSET:-0}"
 config_id="$((task_id / replica_count))"
 instance_id="$((task_id % replica_count + replica_offset))"
 
-seed="${task_id}"
+seed_offset="${SEED_OFFSET:-0}"
+seed="$((task_id + seed_offset))"
 config="_configs/config-${config_id}.json"
 output="_outputs/output-${config_id}-${instance_id}.h5"
 
