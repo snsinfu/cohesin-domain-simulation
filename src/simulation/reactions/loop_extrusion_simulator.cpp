@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <utility>
 
 #include "loop_extrusion_simulator.hpp"
@@ -62,6 +63,7 @@ loop_extrusion_simulator::set_departure_factor(std::size_t site, directions dir,
 loop_extrusion_simulator::site_params&
 loop_extrusion_simulator::get_site_params(std::size_t site, directions dir)
 {
+    assert(site < _sites.size());
     switch (dir) {
     case directions::leftward:
         return _sites[site].leftward;
@@ -108,8 +110,8 @@ loop_extrusion_simulator::step_unloading(double dt, random_engine& random)
     for (std::size_t i = 0; i < _loops.size(); ) {
         auto const loop = _loops[i];
         auto const affinity = harmonic_rate(
-            get_site_params(i, directions::leftward).unloading_factor,
-            get_site_params(i, directions::rightward).unloading_factor
+            get_site_params(loop.site_1, directions::leftward).unloading_factor,
+            get_site_params(loop.site_2, directions::rightward).unloading_factor
         );
         auto const effective_rate = _config.unloading_rate * affinity;
         if (poisson_process(effective_rate, dt, random)) {
