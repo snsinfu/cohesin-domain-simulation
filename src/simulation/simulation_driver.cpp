@@ -253,7 +253,7 @@ simulation_driver::setup_forcefield_connectivity()
         }
 
         for (auto const& loop : chain.config.static_loops) {
-            bonds->add_bonded_pair(loop.pair.site_1, loop.pair.site_2);
+            bonds->add_bonded_pair(chain.start + loop.pair.site_1, chain.start + loop.pair.site_2);
         }
     }
 }
