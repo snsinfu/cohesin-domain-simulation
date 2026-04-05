@@ -122,15 +122,13 @@ simulation_driver::setup_loop_extrusion_simulator()
 
     for (auto const& chain : _setup.chains) {
         for (auto const& feature : chain.config.loop_extrusion_features) {
-            for (std::size_t i = feature.site.start; i < feature.site.end; i++) {
-                foreach_site(feature, [&](auto index, auto dir) {
-                    std::size_t const site = chain.start + index;
-                    if (auto val = feature.loading) { extruders.set_loading_factor(site, dir, *val); }
-                    if (auto val = feature.unloading) { extruders.set_unloading_factor(site, dir, *val); }
-                    if (auto val = feature.arrival) { extruders.set_arrival_factor(site, dir, *val); }
-                    if (auto val = feature.departure) { extruders.set_departure_factor(site, dir, *val); }
-                });
-            }
+            foreach_site(feature, [&](auto index, auto dir) {
+                std::size_t const site = chain.start + index;
+                if (auto val = feature.loading) { extruders.set_loading_factor(site, dir, *val); }
+                if (auto val = feature.unloading) { extruders.set_unloading_factor(site, dir, *val); }
+                if (auto val = feature.arrival) { extruders.set_arrival_factor(site, dir, *val); }
+                if (auto val = feature.departure) { extruders.set_departure_factor(site, dir, *val); }
+            });
         }
 
         // Prevent extruders in adjacent chains from entering this chain.
