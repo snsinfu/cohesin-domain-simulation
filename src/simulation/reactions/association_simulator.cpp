@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <utility>
 #include <vector>
@@ -45,6 +46,7 @@ association_simulator::active_pairs() const
 void
 association_simulator::set_association_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].association_factor = factor;
 }
 
@@ -52,6 +54,7 @@ association_simulator::set_association_factor(std::size_t site, double factor)
 void
 association_simulator::set_dissociation_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].dissociation_factor = factor;
 }
 
@@ -59,6 +62,7 @@ association_simulator::set_dissociation_factor(std::size_t site, double factor)
 void
 association_simulator::set_valency(std::size_t site, std::size_t valency)
 {
+    assert(site < _sites.size());
     _sites[site].valency = valency;
 }
 
@@ -66,6 +70,7 @@ association_simulator::set_valency(std::size_t site, std::size_t valency)
 site_data const&
 association_simulator::get_site_data(std::size_t site) const
 {
+    assert(site < _sites.size());
     return _sites[site];
 }
 

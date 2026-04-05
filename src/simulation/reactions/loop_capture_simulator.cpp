@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <numeric>
 #include <ranges>
 #include <utility>
@@ -39,6 +40,7 @@ loop_capture_simulator::active_pairs() const
 void
 loop_capture_simulator::set_loading_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].loading_factor = factor;
 }
 
@@ -46,6 +48,7 @@ loop_capture_simulator::set_loading_factor(std::size_t site, double factor)
 void
 loop_capture_simulator::set_unloading_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].unloading_factor = factor;
 }
 
@@ -53,6 +56,7 @@ loop_capture_simulator::set_unloading_factor(std::size_t site, double factor)
 void
 loop_capture_simulator::set_capture_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].capture_factor = factor;
 }
 
@@ -60,6 +64,7 @@ loop_capture_simulator::set_capture_factor(std::size_t site, double factor)
 void
 loop_capture_simulator::set_traffic_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].traffic_factor = factor;
 }
 
@@ -67,6 +72,7 @@ loop_capture_simulator::set_traffic_factor(std::size_t site, double factor)
 void
 loop_capture_simulator::set_release_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].release_factor = factor;
 }
 
@@ -75,6 +81,7 @@ loop_capture_simulator::set_release_factor(std::size_t site, double factor)
 void
 loop_capture_simulator::set_arrival_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].arrival_factor = factor;
 }
 
@@ -82,6 +89,7 @@ loop_capture_simulator::set_arrival_factor(std::size_t site, double factor)
 void
 loop_capture_simulator::set_departure_factor(std::size_t site, double factor)
 {
+    assert(site < _sites.size());
     _sites[site].departure_factor = factor;
 }
 
