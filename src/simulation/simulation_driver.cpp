@@ -403,12 +403,13 @@ simulation_driver::run_initialization_extruders()
                 / _config.loop_extrusion.unloading_rate;
 
             // Limit initial loading up to one for each site.
-            std::poisson_distribution<int> count_distr(affinity);
-            if (std::isinf(affinity) || count_distr(_random) > 0) {
+            if (std::isinf(affinity) && std::poisson_distribution<int>(affinity)(random) > 0) {
                 initial_state.loops.push_back({ .id = next_id++, .site_1 = site, .site_2 = site });
             }
         }
     }
+
+    initial_state.metadata.next_id = next_id;
 
     _extruders->load_state(initial_state);
 }
@@ -442,8 +443,7 @@ simulation_driver::run_initialization_captures()
                 / _config.loop_capture.unloading_rate;
 
             // Limit initial loading up to one for each site.
-            std::poisson_distribution<int> count_distr(affinity);
-            if (std::isinf(affinity) || count_distr(_random) > 0) {
+            if (!std::isinf(affinity) && std::poisson_distribution<int>(affinity)(random) > 0) {
                 initial_state.cohesins.push_back({
                     .id            = next_id++,
                     .loaded_site   = site,
